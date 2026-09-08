@@ -13,15 +13,16 @@ Plataforma SaaS multi-tenant para gestão de clientes, leads, serviços, profiss
 4. `architecture/ARCHITECTURE.md`
 5. `architecture/TECH-STACK.md`
 6. `architecture/API.md`
-7. Documentos de domínio em `domains/`
-8. `security/SECURITY.md`
-9. `operations/QA.md`
-10. `operations/DEVOPS.md`
-11. `operations/INFRASTRUCTURE.md`
-12. `operations/BACKUP.md`
-13. `operations/DISASTER-RECOVERY.md`
-14. `docs/DEVELOPMENT-CONTEXT.md`
-15. `docs/CONSOLIDATION.md`
+7. `design/DESIGN.md`
+8. Documentos de domínio em `domains/`
+9. `security/SECURITY.md`
+10. `operations/QA.md`
+11. `operations/DEVOPS.md`
+12. `operations/INFRASTRUCTURE.md`
+13. `operations/BACKUP.md`
+14. `operations/DISASTER-RECOVERY.md`
+15. `docs/DEVELOPMENT-CONTEXT.md`
+16. `docs/CONSOLIDATION.md`
 
 ## 4. Regras arquiteturais obrigatórias
 - Multi-tenancy existe desde o início; isolamento de dados é requisito estrutural.
