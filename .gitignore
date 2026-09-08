@@ -48,3 +48,7 @@ venv/
 # Terraform
 *.tfstate
 *.tfstate.backup
+
+# OpenCode tools
+.omc/
+.omo/
