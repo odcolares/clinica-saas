@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import structlog
 from django.contrib.auth import get_user_model
-from django.db import connection, transaction
+from django.db import connection
 from django.utils.text import slugify
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -95,7 +95,8 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
-        schema = connection.tenant.schema_name
+        tenant = getattr(connection, "tenant", None)
+        schema = tenant.schema_name if tenant else "public"
         tokens = _issue_tokens(user, schema)
         logger.info("login_ok", tenant=schema)
         return Response({"tenant": schema, "user": UserSerializer(user).data, **tokens})
@@ -107,7 +108,8 @@ class LogoutView(TokenBlacklistView):
 
 class MeView(APIView):
     def get(self, request):
-        schema = connection.tenant.schema_name
+        tenant = getattr(connection, "tenant", None)
+        schema = tenant.schema_name if tenant else "public"
         return Response({"tenant": schema, "user": UserSerializer(request.user).data})
 
 
