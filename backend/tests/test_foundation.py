@@ -21,7 +21,7 @@ def _signup(client: Client, slug: str):
             "admin_email": "admin@example.com",
             "admin_password": "SenhaForte123",
         },
-        content_type="application/json",
+        format="json",
     )
 
 
@@ -74,7 +74,7 @@ def test_login_emite_jwt_com_claim_tenant():
         "/api/v1/auth/login/",
         {"username": "admin", "password": "SenhaForte123"},
         HTTP_X_TENANT_ID="clinica_login",
-        content_type="application/json",
+        format="json",
     )
     assert login_resp.status_code == 200, login_resp.content
     assert login_resp.data["tenant"] == "clinica_login"
@@ -119,7 +119,7 @@ def test_rate_limit_login_429():
             "/api/v1/auth/login/",
             {"username": "admin", "password": "SenhaForte123"},
             HTTP_X_TENANT_ID="tenant_rl",
-            content_type="application/json",
+            format="json",
         )
         assert r.status_code == 200, r.content
 
@@ -127,6 +127,6 @@ def test_rate_limit_login_429():
         "/api/v1/auth/login/",
         {"username": "admin", "password": "SenhaForte123"},
         HTTP_X_TENANT_ID="tenant_rl",
-        content_type="application/json",
+        format="json",
     )
     assert blocked.status_code == 429
