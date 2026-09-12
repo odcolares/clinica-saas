@@ -24,7 +24,14 @@ Body `{ refresh }` → `200`. Refresh blacklistado; reuso → `401`.
 ## `GET /auth/me/` (autenticado)
 → `200 { tenant, user }`. Header `x-tenant-id` divergente do claim JWT → `403`.
 
+## `POST /auth/password-reset/` (público, throttle `password_reset`)
+Body `{ email }` → `200 { detail }`. Sempre retorna 200 genérico (não revela se o e-mail existe). Em `DEBUG=True`, inclui `uid` e `token` no response (entrega em produção é uma etapa posterior — Etapa 1).
+
+## `POST /auth/password-reset/confirm/` (público, throttle `password_reset`)
+Body `{ uid, token, new_password(min 8) }` → `200 { detail }`. Valida token via `PasswordResetTokenGenerator`; `set_password` invalida o token automaticamente (uso único). Sempre 200, mesmo token inválido (sem enumeração).
+
 ## Decisões parametrizáveis (PROJECT-CONTEXT §11)
 - `JWT_ACCESS_MINUTES=15`, `JWT_REFRESH_DAYS=7` (env).
 - Throttles: login `10/min`, signup `5/min`, password-reset `5/min` (env).
 - Algoritmo JWT `HS256` fixo.
+- `PASSWORD_RESET_TIMEOUT` padrão Django: 3 dias (259200s). Token expira após esse período.
