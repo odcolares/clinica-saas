@@ -1,5 +1,6 @@
 """Testes da fundação ETAPA 0 — exigem Postgres real (django-tenants não funciona em sqlite)."""
 
+import jwt
 import pytest
 from django.db import connection
 from django.test import Client
@@ -61,3 +62,71 @@ def test_logout_invalida_refresh():
     assert out.status_code == 200, out.content
     reuse = client.post("/api/v1/auth/refresh/", {"refresh": refresh}, format="json")
     assert reuse.status_code == 401
+
+
+def test_login_emite_jwt_com_claim_tenant():
+    """Login com x-tenant-id roteia ao schema correto e o JWT carrega claim tenant."""
+    client = APIClient()
+    resp = _signup(client, "clinica-login")
+    assert resp.status_code == 201
+
+    login_resp = client.post(
+        "/api/v1/auth/login/",
+        {"username": "admin", "password": "SenhaForte123"},
+        HTTP_X_TENANT_ID="clinica_login",
+        content_type="application/json",
+    )
+    assert login_resp.status_code == 200, login_resp.content
+    assert login_resp.data["tenant"] == "clinica_login"
+    assert "access" in login_resp.data
+    assert "refresh" in login_resp.data
+
+    # Verifica o claim "tenant" dentro do JWT (sem validar assinatura)
+    payload = jwt.decode(
+        login_resp.data["access"],
+        options={"verify_signature": False, "verify_exp": False},
+    )
+    assert payload["tenant"] == "clinica_login"
+
+
+def test_isolamento_dados_entre_dois_tenants():
+    """Dados do tenant A não são acessíveis do tenant B (isolamento de schema)."""
+    client = APIClient()
+    resp_a = _signup(client, "tenant-iso-a")
+    resp_b = _signup(client, "tenant-iso-b")
+
+    # Com JWT de A → /me retorna tenant A
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {resp_a.data['access']}")
+    me_a = client.get("/api/v1/auth/me/", HTTP_X_TENANT_ID="tenant_iso_a")
+    assert me_a.status_code == 200
+    assert me_a.data["tenant"] == "tenant_iso_a"
+
+    # Com JWT de B → /me retorna tenant B, não enxerga dados de A
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {resp_b.data['access']}")
+    me_b = client.get("/api/v1/auth/me/", HTTP_X_TENANT_ID="tenant_iso_b")
+    assert me_b.status_code == 200
+    assert me_b.data["tenant"] == "tenant_iso_b"
+    assert me_b.data["tenant"] != me_a.data["tenant"]
+
+
+def test_rate_limit_login_429():
+    """Login throttle: 11ª tentativa dentro de 1 minuto retorna 429."""
+    client = APIClient()
+    _signup(client, "tenant-rl")
+
+    for _ in range(10):
+        r = client.post(
+            "/api/v1/auth/login/",
+            {"username": "admin", "password": "SenhaForte123"},
+            HTTP_X_TENANT_ID="tenant_rl",
+            content_type="application/json",
+        )
+        assert r.status_code == 200, r.content
+
+    blocked = client.post(
+        "/api/v1/auth/login/",
+        {"username": "admin", "password": "SenhaForte123"},
+        HTTP_X_TENANT_ID="tenant_rl",
+        content_type="application/json",
+    )
+    assert blocked.status_code == 429
