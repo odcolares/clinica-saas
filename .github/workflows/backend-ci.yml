@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Install deps
         run: |
           pip install --upgrade pip
@@ -45,7 +45,9 @@ jobs:
       - name: Ruff
         run: ruff check backend/ && ruff format --check backend/
       - name: Bandit
-        run: bandit -q -r backend/apps backend/config || true
+        run: bandit -q -r backend/apps backend/config
+      - name: pip-audit
+        run: pip-audit --requirement backend/requirements.txt --requirement backend/requirements-dev.txt
       - name: Migrations drift check
         working-directory: backend
         run: python manage.py makemigrations --check --dry-run
