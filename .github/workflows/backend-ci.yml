@@ -1,0 +1,57 @@
+name: backend-ci
+
+on:
+  push:
+    branches: [master]
+    paths: ["backend/**", ".github/workflows/backend-ci.yml"]
+  pull_request:
+    paths: ["backend/**", ".github/workflows/backend-ci.yml"]
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: clinica_test
+          POSTGRES_USER: clinica
+          POSTGRES_PASSWORD: clinica_test_only
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U clinica -d clinica_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DJANGO_SECRET_KEY: ci-only-insecure-key
+      DJANGO_DEBUG: "False"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+      DATABASE_URL: postgres://clinica:clinica_test_only@localhost:5432/clinica_test
+      REDIS_URL: redis://localhost:6379/0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          pip install --upgrade pip
+          pip install -r backend/requirements.txt -r backend/requirements-dev.txt
+      - name: Ruff
+        run: ruff check backend/ && ruff format --check backend/
+      - name: Bandit
+        run: bandit -q -r backend/apps backend/config || true
+      - name: Migrations drift check
+        working-directory: backend
+        run: python manage.py makemigrations --check --dry-run
+      - name: Migrate schemas
+        working-directory: backend
+        run: python manage.py migrate_schemas --noinput
+      - name: Tests
+        working-directory: backend
+        run: pytest --cov=apps --cov-report=term-missing

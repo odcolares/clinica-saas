@@ -44,6 +44,15 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.sqlite3
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+coverage.xml
 
 # Terraform
 *.tfstate

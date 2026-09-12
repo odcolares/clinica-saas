@@ -1,0 +1,61 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: clinica-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-clinica}
+      POSTGRES_USER: ${POSTGRES_USER:-clinica}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-clinica_dev_only}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-clinica} -d $${POSTGRES_DB:-clinica}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: clinica-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # API Django (uso em dev via docker; por padrão rode localmente com venv).
+  # Requer .env na raiz do backend (ver .env.example). Não commitar .env.
+  api:
+    build:
+      context: ./backend
+    container_name: clinica-api
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-clinica}:${POSTGRES_PASSWORD:-clinica_dev_only}@db:5432/${POSTGRES_DB:-clinica}
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate_schemas --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    profiles: ["api"]
+
+volumes:
+  pgdata:
+  redisdata:
