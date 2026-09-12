@@ -11,9 +11,11 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from .settings_base import ALLOWED_HOSTS, BASE_DIR, DEBUG, SECRET_KEY, env  # noqa: F401
 
+# TenantMainMiddleware removido: faz routing por hostname (não aplicável a
+# API JWT). A resolução de tenant agora é feita pelo TenantContextMiddleware
+# a partir do JWT (claim "tenant") ou do header x-tenant-id (roteamento para
+# login/signup). Veja apps/common/middleware.py.
 MIDDLEWARE = [
-    "django_tenants.middleware.main.TenantMainMiddleware",
-    "apps.common.middleware.TenantContextMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -21,6 +23,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.common.middleware.TenantContextMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",

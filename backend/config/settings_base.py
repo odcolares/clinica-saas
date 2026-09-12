@@ -37,6 +37,7 @@ SHARED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.admin",
+    "rest_framework_simplejwt.token_blacklist",  # Global: blacklist válida em todos tenants
     "apps.tenants",
 ]
 
@@ -48,16 +49,6 @@ TENANT_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.admin",
     "rest_framework",
-    "rest_framework_simplejwt.token_blacklist",
-    "guardian",
-    "simple_history",
-    "apps.accounts",
-    "apps.common",
-]
-
-INSTALLED_APPS = list(SHARED_APPS) + [
-    "rest_framework",
-    "rest_framework_simplejwt.token_blacklist",
     "django_filters",
     "corsheaders",
     "guardian",
@@ -66,6 +57,8 @@ INSTALLED_APPS = list(SHARED_APPS) + [
     "apps.accounts",
     "apps.common",
 ]
+
+INSTALLED_APPS = SHARED_APPS + TENANT_APPS
 
 TENANT_MODEL = "tenants.Tenant"
 TENANT_DOMAIN_MODEL = "tenants.Domain"
