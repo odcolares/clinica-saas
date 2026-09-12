@@ -1,0 +1,25 @@
+name: deploy-backend
+
+# Deploy separado (CI não faz deploy). Apenas em branch protegida (master).
+on:
+  push:
+    branches: [master]
+    paths: ["backend/**", ".github/workflows/deploy.yml"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: |
+          curl -fsSL https://railway.app/install.sh | bash
+          echo "$HOME/.railway/bin" >> "$GITHUB_PATH"
+
+      - name: Deploy backend to Railway
+        working-directory: backend
+        run: railway up --detach --service clinicasaas-backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
