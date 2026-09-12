@@ -49,22 +49,38 @@ class SignupView(APIView):
                 {"detail": "Tenant já existe."}, status=status.HTTP_409_CONFLICT
             )
 
-        with transaction.atomic():
-            tenant = Tenant(schema_name=schema, name=data["tenant_name"])
-            tenant.slug = data["tenant_slug"]
-            tenant.save()  # cria schema
+        tenant = Tenant(schema_name=schema, name=data["tenant_name"])
+        tenant.slug = data["tenant_slug"]
+        try:
+            # save() cria o schema do tenant (auto_create_schema=True)
+            tenant.save()
+        except Exception:
+            logger.warning("tenant_signup_schema_failed", tenant=schema)
+            return Response(
+                {"detail": "Não foi possível provisionar o tenant."},
+                status=status.HTTP_409_CONFLICT,
+            )
 
         # Troca para o schema novo e cria o admin dentro dele
-        connection.set_tenant(tenant)
-        _ensure_default_roles()
-        admin_role = Role.objects.get(name="admin")
-        admin = User.objects.create_user(
-            username=data["admin_username"],
-            email=data["admin_email"],
-            password=data["admin_password"],
-            role=admin_role,
-            status="active",
-        )
+        try:
+            connection.set_tenant(tenant)
+            _ensure_default_roles()
+            admin_role = Role.objects.get(name="admin")
+            admin = User.objects.create_user(
+                username=data["admin_username"],
+                email=data["admin_email"],
+                password=data["admin_password"],
+                role=admin_role,
+                status="active",
+            )
+        except Exception:
+            logger.warning("tenant_signup_admin_failed", tenant=schema)
+            # Compensação documentada: schema órfão fica auditável via lista de
+            # tenants; a falha é 409 para permitir retry idempotente do signup.
+            return Response(
+                {"detail": "Não foi possível provisionar o admin do tenant."},
+                status=status.HTTP_409_CONFLICT,
+            )
         tokens = _issue_tokens(admin, schema)
         logger.info("tenant_signup", tenant=schema)
         payload = {"tenant": schema, "user": UserSerializer(admin).data, **tokens}
