@@ -39,6 +39,11 @@ class SignupView(APIView):
     throttle_scope = "signup"
 
     def post(self, request):
+        # Signup sempre opera no schema public. Como um request anterior pode
+        # ter deixado a conexão no schema de um tenant (ex.: set_tenant no final
+        # de signups/login anteriores, num worker/thread único), resetamos para
+        # public de forma idempotente antes de provisionar.
+        connection.set_schema_to_public()
         serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
@@ -54,8 +59,8 @@ class SignupView(APIView):
         try:
             # save() cria o schema do tenant (auto_create_schema=True)
             tenant.save()
-        except Exception:
-            logger.warning("tenant_signup_schema_failed", tenant=schema)
+        except Exception as exc:
+            logger.warning("tenant_signup_schema_failed", tenant=schema, error=str(exc))
             return Response(
                 {"detail": "Não foi possível provisionar o tenant."},
                 status=status.HTTP_409_CONFLICT,
@@ -73,15 +78,25 @@ class SignupView(APIView):
                 role=admin_role,
                 status="active",
             )
-        except Exception:
-            logger.warning("tenant_signup_admin_failed", tenant=schema)
+            # Emitir tokens ainda dentro do schema do tenant: o blacklist do
+            # simplejwt (BLACKLIST_AFTER_ROTATION) grava em
+            # token_blacklist_outstandingtoken, que só existe no schema do
+            # tenant (TENANT_APPS).
+            tokens = _issue_tokens(admin, schema)
+        except Exception as exc:
+            logger.warning("tenant_signup_admin_failed", tenant=schema, error=str(exc))
             # Compensação documentada: schema órfão fica auditável via lista de
             # tenants; a falha é 409 para permitir retry idempotente do signup.
             return Response(
                 {"detail": "Não foi possível provisionar o admin do tenant."},
                 status=status.HTTP_409_CONFLICT,
             )
-        tokens = _issue_tokens(admin, schema)
+        finally:
+            # Não vazar o schema do tenant para requests seguintes na mesma
+            # conexão (worker/thread único). Operations de signup pertencem ao
+            # public; o próximo request voltará a selecionar seu schema via JWT
+            # ou header.
+            connection.set_schema_to_public()
         logger.info("tenant_signup", tenant=schema)
         payload = {"tenant": schema, "user": UserSerializer(admin).data, **tokens}
         return Response(payload, status=status.HTTP_201_CREATED)
