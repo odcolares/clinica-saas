@@ -92,9 +92,28 @@ SPECTACULAR_SETTINGS = {
 }
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 
+_SENSITIVE_LOG_KEYS = frozenset(
+    {
+        "password",
+        "new_password",
+        "token",
+        "refresh",
+        "access",
+        "authorization",
+        "cookie",
+    }
+)
+
+
+def _scrub_secrets(logger, method_name, event_dict):
+    """Remove sensitive keys from log events (case-insensitive)."""
+    return {k: v for k, v in event_dict.items() if k.lower() not in _SENSITIVE_LOG_KEYS}
+
+
 structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
+        _scrub_secrets,
         structlog.processors.add_log_level,
         structlog.processors.TimeStamper(fmt="iso"),
         structlog.processors.StackInfoRenderer(),
@@ -103,6 +122,21 @@ structlog.configure(
     ]
 )
 
+
+def _sentry_before_send(event, hint):
+    """Strip sensitive data from Sentry events before sending."""
+    request_data = event.get("request", {})
+    headers = request_data.get("headers", {})
+    for key in list(headers.keys()):
+        if key.lower() in ("authorization", "cookie"):
+            del headers[key]
+    user_data = event.get("user", {})
+    for key in list(user_data.keys()):
+        if key.lower() in ("password", "token", "refresh", "access"):
+            del user_data[key]
+    return event
+
+
 if env("SENTRY_DSN"):
     sentry_sdk.init(
         dsn=env("SENTRY_DSN"),
@@ -110,4 +144,5 @@ if env("SENTRY_DSN"):
         release=env("SENTRY_RELEASE"),
         integrations=[DjangoIntegration()],
         send_default_pii=False,
+        before_send=_sentry_before_send,
     )
