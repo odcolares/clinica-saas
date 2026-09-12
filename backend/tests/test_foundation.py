@@ -3,7 +3,7 @@
 import jwt
 import pytest
 from django.db import connection
-from django.test import Client
+from django.test import Client, override_settings
 from rest_framework.test import APIClient
 
 from apps.tenants.models import Tenant
@@ -130,3 +130,153 @@ def test_rate_limit_login_429():
         format="json",
     )
     assert blocked.status_code == 429
+
+
+def test_password_reset_request_generic_200_for_unknown_email():
+    """Reset request sempre retorna 200 genérico, mesmo e-mail inexistente."""
+    client = APIClient()
+    _signup(client, "tenant-reset-unknown")
+    resp = client.post(
+        "/api/v1/auth/password-reset/",
+        {"email": "naoexiste@example.com"},
+        HTTP_X_TENANT_ID="tenant_reset_unknown",
+        format="json",
+    )
+    assert resp.status_code == 200
+    assert "detail" in resp.data
+
+
+@override_settings(DEBUG=True)
+def test_password_reset_flow_resets_password():
+    """Fluxo completo: reset request → confirm → senha antiga inválida, nova funciona."""
+    client = APIClient()
+    resp = _signup(client, "tenant-reset-flow")
+    assert resp.status_code == 201
+
+    reset_resp = client.post(
+        "/api/v1/auth/password-reset/",
+        {"email": "admin@example.com"},
+        HTTP_X_TENANT_ID="tenant_reset_flow",
+        format="json",
+    )
+    assert reset_resp.status_code == 200
+    assert "detail" in reset_resp.data
+
+    uid = reset_resp.data["uid"]
+    token = reset_resp.data["token"]
+
+    confirm_resp = client.post(
+        "/api/v1/auth/password-reset/confirm/",
+        {"uid": uid, "token": token, "new_password": "NovaSenha456"},
+        HTTP_X_TENANT_ID="tenant_reset_flow",
+        format="json",
+    )
+    assert confirm_resp.status_code == 200
+
+    # Senha antiga não funciona mais
+    old_login = client.post(
+        "/api/v1/auth/login/",
+        {"username": "admin", "password": "SenhaForte123"},
+        HTTP_X_TENANT_ID="tenant_reset_flow",
+        format="json",
+    )
+    assert old_login.status_code == 400
+
+    # Nova senha funciona
+    new_login = client.post(
+        "/api/v1/auth/login/",
+        {"username": "admin", "password": "NovaSenha456"},
+        HTTP_X_TENANT_ID="tenant_reset_flow",
+        format="json",
+    )
+    assert new_login.status_code == 200
+
+
+@override_settings(DEBUG=True)
+def test_password_reset_reused_token_rejected():
+    """Token de reset é de uso único: reutilização não altera a senha."""
+    client = APIClient()
+    resp = _signup(client, "tenant-reset-reuse")
+    assert resp.status_code == 201
+
+    reset_resp = client.post(
+        "/api/v1/auth/password-reset/",
+        {"email": "admin@example.com"},
+        HTTP_X_TENANT_ID="tenant_reset_reuse",
+        format="json",
+    )
+    uid = reset_resp.data["uid"]
+    token = reset_resp.data["token"]
+
+    # Primeiro uso: sucesso
+    confirm_resp = client.post(
+        "/api/v1/auth/password-reset/confirm/",
+        {"uid": uid, "token": token, "new_password": "NovaSenha789"},
+        HTTP_X_TENANT_ID="tenant_reset_reuse",
+        format="json",
+    )
+    assert confirm_resp.status_code == 200
+
+    # Reutilização: 200 genérico (sem enumeração), mas senha não muda
+    reuse_resp = client.post(
+        "/api/v1/auth/password-reset/confirm/",
+        {"uid": uid, "token": token, "new_password": "OutraSenha000"},
+        HTTP_X_TENANT_ID="tenant_reset_reuse",
+        format="json",
+    )
+    assert reuse_resp.status_code == 200
+
+    # Nova senha do primeiro reset ainda funciona
+    login_resp = client.post(
+        "/api/v1/auth/login/",
+        {"username": "admin", "password": "NovaSenha789"},
+        HTTP_X_TENANT_ID="tenant_reset_reuse",
+        format="json",
+    )
+    assert login_resp.status_code == 200
+
+    # Segunda senha NÃO foi aplicada
+    login_resp2 = client.post(
+        "/api/v1/auth/login/",
+        {"username": "admin", "password": "OutraSenha000"},
+        HTTP_X_TENANT_ID="tenant_reset_reuse",
+        format="json",
+    )
+    assert login_resp2.status_code == 400
+
+
+def test_scrub_processor_removes_secrets():
+    """O processor structlog remove chaves sensíveis (case-insensitive)."""
+    from config.settings_middleware import _scrub_secrets
+
+    event = {
+        "event": "password_reset_requested",
+        "tenant": "clinica_a",
+        "password": "SenhaForte123",
+        "token": "abc123token",
+        "Authorization": "Bearer xyz",
+        "Cookie": "session=abc",
+        "safe_key": "safe_value",
+    }
+    result = _scrub_secrets(None, "info", event)
+    assert "password" not in result
+    assert "token" not in result
+    assert "Authorization" not in result
+    assert "Cookie" not in result
+    assert result["event"] == "password_reset_requested"
+    assert result["tenant"] == "clinica_a"
+    assert result["safe_key"] == "safe_value"
+
+
+def test_failed_login_no_echoed_password():
+    """Resposta de login falhou não contém a senha enviada."""
+    client = APIClient()
+    _signup(client, "tenant-noleak")
+    resp = client.post(
+        "/api/v1/auth/login/",
+        {"username": "admin", "password": "SenhaErrada999"},
+        HTTP_X_TENANT_ID="tenant_noleak",
+        format="json",
+    )
+    assert resp.status_code == 400
+    assert "SenhaErrada999" not in resp.content.decode()

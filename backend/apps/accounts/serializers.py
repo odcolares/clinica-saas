@@ -45,6 +45,16 @@ class SignupSerializer(serializers.Serializer):
     )
 
 
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    new_password = serializers.CharField(max_length=128, write_only=True, min_length=8)
+
+
 class RefreshSerializer(serializers.Serializer):
     refresh = serializers.CharField()
 

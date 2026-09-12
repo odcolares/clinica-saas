@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 import structlog
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.db import connection
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.text import slugify
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -13,7 +17,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenRefreshView
 
 from apps.accounts.models import Role
-from apps.accounts.serializers import LoginSerializer, SignupSerializer, UserSerializer
+from apps.accounts.serializers import (
+    LoginSerializer,
+    PasswordResetConfirmSerializer,
+    PasswordResetSerializer,
+    SignupSerializer,
+    UserSerializer,
+)
 from apps.tenants.models import Tenant
 
 logger = structlog.get_logger(__name__)
@@ -128,7 +138,72 @@ class MeView(APIView):
         return Response({"tenant": schema, "user": UserSerializer(request.user).data})
 
 
-__all__ = ["LoginView", "LogoutView", "MeView", "SignupView", "TenantTokenRefreshView"]
+_password_reset_token_generator = PasswordResetTokenGenerator()
+
+
+class PasswordResetView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_scope = "password_reset"
+
+    def post(self, request):
+        serializer = PasswordResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
+        tenant = getattr(connection, "tenant", None)
+        schema = tenant.schema_name if tenant else "public"
+
+        user = User.objects.filter(email=email).first()
+
+        logger.info("password_reset_requested", tenant=schema)
+        response = {
+            "detail": "Se o e-mail estiver cadastrado, você receberá instruções para redefinir sua senha."
+        }
+        if settings.DEBUG and user is not None:
+            response["uid"] = urlsafe_base64_encode(force_bytes(user.pk))
+            response["token"] = _password_reset_token_generator.make_token(user)
+        return Response(response, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_scope = "password_reset"
+
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        uid = serializer.validated_data["uid"]
+        token = serializer.validated_data["token"]
+        new_password = serializer.validated_data["new_password"]
+        tenant = getattr(connection, "tenant", None)
+        schema = tenant.schema_name if tenant else "public"
+
+        try:
+            user_id = force_str(urlsafe_base64_decode(uid))
+            user = User.objects.get(pk=user_id)
+            if _password_reset_token_generator.check_token(user, token):
+                user.set_password(new_password)
+                user.save()
+                logger.info("password_reset_confirmed", tenant=schema)
+            else:
+                logger.info("password_reset_invalid_token", tenant=schema)
+        except (User.DoesNotExist, ValueError, TypeError):
+            logger.info("password_reset_invalid_token", tenant=schema)
+
+        return Response(
+            {"detail": "Senha redefinida com sucesso."},
+            status=status.HTTP_200_OK,
+        )
+
+
+__all__ = [
+    "LoginView",
+    "LogoutView",
+    "MeView",
+    "PasswordResetConfirmView",
+    "PasswordResetView",
+    "SignupView",
+    "TenantTokenRefreshView",
+]
 
 
 class TenantTokenRefreshView(TokenRefreshView):
