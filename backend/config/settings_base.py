@@ -36,11 +36,15 @@ SHARED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django.contrib.admin",
-    "rest_framework_simplejwt.token_blacklist",  # Global: blacklist válida em todos tenants
     "apps.tenants",
 ]
 
+# admin e token_blacklist ficam em TENANT_APPS (não em SHARED): ambos criam FK
+# para o AUTH_USER_MODEL (accounts.User), que é tenant-specific. Se ficassem em
+# SHARED_APPS, o migrate_schemas tentaria criar essas FKs no schema public onde
+# a tabela accounts_user não existe — quebrando a migração do zero. O admin do
+# Django passa a ser por-tenant (cada tenant vê só os seus dados), e a token
+# blacklist referencia usuários do próprio schema.
 TENANT_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.auth",
@@ -48,6 +52,7 @@ TENANT_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.admin",
+    "rest_framework_simplejwt.token_blacklist",
     "rest_framework",
     "django_filters",
     "corsheaders",
@@ -58,7 +63,10 @@ TENANT_APPS = [
     "apps.common",
 ]
 
-INSTALLED_APPS = SHARED_APPS + TENANT_APPS
+# contenttypes aparece em SHARED_APPS e TENANT_APPS (padrão exigido pelo
+# django-tenants). Deduplicar preservando a ordem para evitar o erro do Django
+# "Application labels aren't unique, duplicates: contenttypes".
+INSTALLED_APPS = list(dict.fromkeys(SHARED_APPS + TENANT_APPS))
 
 TENANT_MODEL = "tenants.Tenant"
 TENANT_DOMAIN_MODEL = "tenants.Domain"
