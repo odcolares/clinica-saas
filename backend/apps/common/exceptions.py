@@ -16,6 +16,11 @@ class Conflict(APIException):
 
 
 def tenant_aware_exception_handler(exc, context):
+    """Envelope de erro padronizado: envolve detalhes não-detail em {"detail": ...}.
+
+    Conflict (409) é um APIException subclasse; o exception_handler padrão já
+    preserva seu status_code (HTTP_409_CONFLICT). Apenas normalizamos o envelope.
+    """
     response = exception_handler(exc, context)
     if response is None:
         return None

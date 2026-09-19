@@ -87,14 +87,14 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 **Objetivo:** Agendamento de serviços com controle de disponibilidade.
 
 ### Marcos — Backend API
-- [ ] Model Professional (perfil + especialidades)
-- [ ] Model Service (duração, preço)
-- [ ] CRUD de Appointments
-- [ ] Regras de conflito (horário indisponível)
-- [ ] Disponibilidade por profissional
-- [ ] Integração Google Calendar (adapter pattern)
-- [ ] Webhook de confirmação
-- [ ] Testes de conflito (edge cases)
+- [x] Model Professional (perfil + especialidades)
+- [x] Model Service (duração, preço)
+- [x] CRUD de Appointments
+- [x] Regras de conflito (horário indisponível)
+- [x] Disponibilidade por profissional
+- [x] Integração Google Calendar (adapter pattern)
+- [x] Webhook de confirmação
+- [x] Testes de conflito (edge cases)
 
 ### Odair — Frontend
 - [ ] Calendário mensal (FullCalendar ou equivalente)

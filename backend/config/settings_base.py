@@ -62,6 +62,7 @@ TENANT_APPS = [
     "apps.accounts",
     "apps.common",
     "apps.crm",
+    "apps.scheduling",
 ]
 
 # contenttypes aparece em SHARED_APPS e TENANT_APPS (padrão exigido pelo
