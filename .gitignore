@@ -64,4 +64,5 @@ media/
 .omc/
 .omo/
 graphify-out/
-.maestri/
+#.maestri/
+.commandcode/
