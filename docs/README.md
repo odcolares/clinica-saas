@@ -9,9 +9,9 @@ This directory contains auto-generated and manually maintained API documentation
 
 ## Contents
 
-- `API-CONTRACT.md` — Full API contract with endpoint specs, request/response schemas, and error codes
-- `openapi.yaml` — OpenAPI 3.0 schema (auto-generated via drf-spectacular)
-- `ARCHITECTURE.md` — Backend architecture decisions and patterns
+- `API-FUNDACAO.md` — Endpoints da fundação (ETAPA 0): health, signup, auth JWT
+- `API-CRM.md` — Endpoints do CRM (ETAPA 1): leads, customers, contatos, endereços, notas, timeline, tags
+- `Projeto_SaaS/architecture/API.md` — Contrato canônico de alto nível
 
 ## Quick Start
 

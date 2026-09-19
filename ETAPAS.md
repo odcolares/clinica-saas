@@ -28,19 +28,19 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 **Objetivo:** Projeto estruturado, autenticação multi-tenant funcionando, infraestrutura básica.
 
 ### Marcos — Backend + Infra
-- [ ] Criar repositório Git
-- [ ] Estruturar pastas (backend/, frontend/, docs/)
-- [ ] Setup Django + Django REST Framework
-- [ ] django-tenants configurado (schema-level isolation)
-- [ ] Signup de tenant (cria schema + usuário admin)
-- [ ] Login + JWT (autenticação backend)
-- [ ] Middleware de tenant context (`x-tenant-id`)
-- [ ] Setup Docker local (PostgreSQL + Redis)
-- [ ] CI/CD pipeline (GitHub Actions → Railway + Vercel)
-- [ ] Variáveis de ambiente (.env)
-- [ ] Sentry + structlog configurado
-- [ ] Rate limiting no backend
-- [ ] Documentar endpoints iniciais
+- [x] Criar repositório Git
+- [x] Estruturar pastas (backend/, frontend/, docs/)
+- [x] Setup Django + Django REST Framework
+- [x] django-tenants configurado (schema-level isolation)
+- [x] Signup de tenant (cria schema + usuário admin)
+- [x] Login + JWT (autenticação backend)
+- [x] Middleware de tenant context (`x-tenant-id`)
+- [x] Setup Docker local (PostgreSQL + Redis)
+- [x] CI/CD pipeline (GitHub Actions → Railway + Vercel)
+- [x] Variáveis de ambiente (.env)
+- [x] Sentry + structlog configurado
+- [x] Rate limiting no backend
+- [x] Documentar endpoints iniciais
 
 ### Odair — Frontend Setup
 - [ ] Setup Next.js + TypeScript strict
@@ -59,15 +59,15 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 **Objetivo:** Cadastro de clientes e leads funcionando com multi-tenancy.
 
 ### Marcos — Backend API
-- [ ] CRUD de Leads (`POST/GET/PATCH /leads`)
-- [ ] CRUD de Customers (`GET/POST /customers`)
-- [ ] Conversão Lead → Customer (endpoint)
-- [ ] Tags, contatos, notas, timeline
-- [ ] Permissões por tenant (django-guardian)
-- [ ] Filtros por schema em todos os endpoints
-- [ ] Audit log (django-simple-history)
-- [ ] Testes unitários (modelos + views)
-- [ ] Documentar todos os endpoints na API.md
+- [x] CRUD de Leads (`POST/GET/PATCH /leads`)
+- [x] CRUD de Customers (`GET/POST /customers`)
+- [x] Conversão Lead → Customer (endpoint)
+- [x] Tags, contatos, notas, timeline
+- [x] Permissões por tenant (django-guardian)
+- [x] Filtros por schema em todos os endpoints
+- [x] Audit log (django-simple-history)
+- [x] Testes unitários (modelos + views)
+- [x] Documentar todos os endpoints na API.md
 
 ### Odair — Frontend
 - [ ] Listagem de leads com filtros

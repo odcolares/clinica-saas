@@ -61,6 +61,7 @@ TENANT_APPS = [
     "drf_spectacular",
     "apps.accounts",
     "apps.common",
+    "apps.crm",
 ]
 
 # contenttypes aparece em SHARED_APPS e TENANT_APPS (padrão exigido pelo
