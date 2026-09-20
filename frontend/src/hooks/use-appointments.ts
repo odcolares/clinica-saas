@@ -9,6 +9,8 @@ import type {
   Professional,
   Service,
   PaginatedResponse,
+  ProfessionalAvailability,
+  AvailabilityFilters,
 } from "@/types/api"
 
 const APPOINTMENTS_KEY = "/api/v1/appointments"
@@ -135,4 +137,57 @@ export async function cancelAppointment(id: string): Promise<Appointment> {
   mutate(`/api/v1/appointments/${id}`)
   mutate(APPOINTMENTS_KEY)
   return appointment
+}
+
+export async function confirmAppointment(id: string): Promise<Appointment> {
+  const res = await fetch(`/api/v1/appointments/${id}/confirm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  })
+
+  if (!res.ok) {
+    const errorData = await res.json()
+    throw new Error(errorData.detail || "Falha ao confirmar agendamento")
+  }
+
+  const appointment = await res.json() as Appointment
+  mutate(`/api/v1/appointments/${id}`)
+  mutate(APPOINTMENTS_KEY)
+  return appointment
+}
+
+export function useProfessionalAvailability(filters: AvailabilityFilters) {
+  const queryString = filters
+    ? "?" + new URLSearchParams(filters as unknown as Record<string, string>).toString()
+    : ""
+
+  const { data, error, isLoading, isValidating } = useSWR<ProfessionalAvailability[]>(
+    filters.date ? `/api/v1/availability${queryString}` : null,
+    fetcher,
+    swrConfig
+  )
+
+  return {
+    availability: data ?? [],
+    isLoading,
+    isValidating,
+    isError: !!error,
+    error,
+  }
+}
+
+export function useProfessionalAvailabilityByDate(professionalId: string, date: string) {
+  const { data, error, isLoading, isValidating } = useSWR<ProfessionalAvailability>(
+    professionalId && date ? `/api/v1/availability/${professionalId}?date=${date}` : null,
+    fetcher,
+    swrConfig
+  )
+
+  return {
+    availability: data,
+    isLoading,
+    isValidating,
+    isError: !!error,
+    error,
+  }
 }
