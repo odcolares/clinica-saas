@@ -70,13 +70,13 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 - [x] Documentar todos os endpoints na API.md
 
 ### Odair — Frontend
-- [ ] Listagem de leads com filtros
-- [ ] Formulário de lead + validação
-- [ ] Detalhe de customer + timeline
-- [ ] Conversão lead → customer (UI)
-- [ ] Dashboard simples (cards + gráfico)
-- [ ] Autenticação integrada (guardar JWT, redirect)
-- [ ] Tratamento de erros (toast notifications)
+- [x] Listagem de leads com filtros
+- [x] Formulário de lead + validação
+- [x] Detalhe de customer + timeline
+- [x] Conversão lead → customer (UI)
+- [x] Dashboard simples (cards + gráfico)
+- [x] Autenticação integrada (guardar JWT, redirect)
+- [x] Tratamento de erros (toast notifications)
 
 ---
 
@@ -97,13 +97,13 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 - [x] Testes de conflito (edge cases)
 
 ### Odair — Frontend
-- [ ] Calendário mensal (FullCalendar ou equivalente)
-- [ ] Formulário de agendamento
-- [ ] Lista de profissionais com disponibilidade
-- [ ] Seleção de serviço + profissional
-- [ ] Confirmação/cancelamento pelo cliente
-- [ ] Visualização de agenda do tenant
-- [ ] Responsividade mobile
+- [x] Calendário mensal (FullCalendar ou equivalente)
+- [x] Formulário de agendamento
+- [x] Lista de profissionais com disponibilidade
+- [x] Seleção de serviço + profissional
+- [x] Confirmação/cancelamento pelo cliente
+- [x] Visualização de agenda do tenant
+- [x] Responsividade mobile
 
 ---
 
@@ -270,4 +270,4 @@ Etapa 5 (Configurações) ◄─────────────────
 
 > **Criado:** 2026-01-15
 > **Responsáveis:** Marcos (Backend/DB) + Odair (Frontend/UI)
-> **Atualização:** Conforme etapas concluídas
+> **Atualização:** 2026-09-20 — Etapa 2 Frontend (Agenda) concluída: calendário FullCalendar, formulário agendamento, disponibilidade profissionais, confirmação/cancelamento, responsividade mobile
