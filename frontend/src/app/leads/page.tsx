@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation"
 import useSWR from "swr"
 import { Suspense } from "react"
 import { swrConfig, fetcher } from "@/lib/swr-config"
-import { Lead, LeadStatus, LeadOrigin } from "@/types/api"
+import { Lead, LeadStatus } from "@/types/api"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -21,19 +21,19 @@ import { format } from "date-fns"
 import { ptBR } from "date-fns/locale/pt-BR"
 
 const STATUS_LABELS: Record<LeadStatus, string> = {
-  novo: "Novo",
-  contatado: "Contatado",
-  qualificado: "Qualificado",
-  convertido: "Convertido",
-  desativado: "Desativado",
+  NEW: "Novo",
+  CONTACTED: "Contatado",
+  QUALIFIED: "Qualificado",
+  CONVERTED: "Convertido",
+  LOST: "Desativado",
 }
 
-const ORIGIN_LABELS: Record<LeadOrigin, string> = {
+const SOURCE_LABELS: Record<string, string> = {
   google: "Google",
   facebook: "Facebook",
   indicacao: "Indicação",
   site: "Site",
-  outro: "Outro",
+  other: "Outro",
 }
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
@@ -41,9 +41,9 @@ const STATUS_OPTIONS: { value: string; label: string }[] = [
   ...Object.entries(STATUS_LABELS).map(([value, label]) => ({ value, label })),
 ]
 
-const ORIGIN_OPTIONS: { value: string; label: string }[] = [
+const SOURCE_OPTIONS: { value: string; label: string }[] = [
   { value: "all", label: "Todas as origens" },
-  ...Object.entries(ORIGIN_LABELS).map(([value, label]) => ({ value, label })),
+  ...Object.entries(SOURCE_LABELS).map(([value, label]) => ({ value, label })),
 ]
 
 function buildQueryString(params: Record<string, string | undefined>) {
@@ -67,7 +67,7 @@ function LeadsListContent() {
   const searchParams = useSearchParams()
 
   const statusFilter = searchParams.get("status") ?? "all"
-  const originFilter = searchParams.get("origin") ?? "all"
+  const sourceFilter = searchParams.get("source") ?? "all"
   const searchFilter = searchParams.get("search") ?? ""
   const dateStart = searchParams.get("date_start") ?? ""
   const dateEnd = searchParams.get("date_end") ?? ""
@@ -75,7 +75,7 @@ function LeadsListContent() {
 
   const queryString = buildQueryString({
     status: statusFilter,
-    origin: originFilter,
+    source: sourceFilter,
     search: searchFilter || undefined,
     date_start: dateStart || undefined,
     date_end: dateEnd || undefined,
@@ -160,12 +160,12 @@ function LeadsListContent() {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={originFilter} onValueChange={(v) => updateParam("origin", v)}>
+            <Select value={sourceFilter} onValueChange={(v) => updateParam("source", v)}>
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Origem" />
               </SelectTrigger>
               <SelectContent>
-                {ORIGIN_OPTIONS.map((opt) => (
+                {SOURCE_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
                   </SelectItem>
@@ -227,7 +227,7 @@ function LeadsListContent() {
                     <TableCell>
                       <Badge variant="secondary">{STATUS_LABELS[lead.status]}</Badge>
                     </TableCell>
-                    <TableCell>{ORIGIN_LABELS[lead.origin]}</TableCell>
+                    <TableCell>{SOURCE_LABELS[lead.source]}</TableCell>
                     <TableCell>
                       {format(new Date(lead.created_at), "dd/MM/yyyy", { locale: ptBR })}
                     </TableCell>

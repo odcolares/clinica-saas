@@ -21,17 +21,17 @@ const INTERACTION_ICONS: Record<InteractionType, ReactElement> = {
 }
 
 const APPOINTMENT_STATUS_LABELS = {
-  agendado: "Agendado",
-  confirmado: "Confirmado",
-  cancelado: "Cancelado",
-  concluido: "Concluído",
+  scheduled: "Agendado",
+  confirmed: "Confirmado",
+  cancelled: "Cancelado",
+  completed: "Concluído",
 }
 
 const APPOINTMENT_STATUS_COLORS = {
-  agendado: "secondary",
-  confirmado: "default",
-  cancelado: "destructive",
-  concluido: "outline",
+  scheduled: "secondary",
+  confirmed: "default",
+  cancelled: "destructive",
+  completed: "outline",
 } as const
 
 interface CustomerDetailContentProps {
@@ -188,7 +188,7 @@ export function CustomerDetailContent({ customerId }: CustomerDetailContentProps
                 {timeline.map((entry) => (
                   <div key={entry.id} className="flex gap-3">
                     <div className="flex-shrink-0 mt-0.5">
-                      {INTERACTION_ICONS[entry.type]}
+                      {INTERACTION_ICONS[entry.kind]}
                     </div>
                     <div className="flex-1">
                       <p className="text-sm">{entry.description}</p>

@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, CalendarIcon } from "lucide-react"
+import { createAppointment } from "@/hooks/use-appointments"
+import { toast } from "sonner"
 import { customers, professionals, services } from "@/mocks/data"
 
 const appointmentSchema = z.object({
@@ -24,9 +26,12 @@ const appointmentSchema = z.object({
 
 type AppointmentFormValues = z.infer<typeof appointmentSchema>
 
-export function NewAppointmentForm() {
+interface NewAppointmentFormProps {
+  onSuccess?: () => void
+}
+
+export function NewAppointmentForm({ onSuccess }: NewAppointmentFormProps) {
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
 
   const {
     register,
@@ -38,24 +43,15 @@ export function NewAppointmentForm() {
 
   const onSubmit = async (data: AppointmentFormValues) => {
     setError(null)
-    setSuccess(false)
 
     try {
-      const res = await fetch("/api/v1/appointments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-
-      if (!res.ok) {
-        const errorData = await res.json()
-        setError(errorData.detail || "Falha ao criar agendamento")
-        return
-      }
-
-      setSuccess(true)
+      await createAppointment(data)
+      toast.success("Agendamento criado com sucesso!")
+      onSuccess?.()
     } catch (err) {
-      setError("Falha na conexão")
+      const message = err instanceof Error ? err.message : "Falha ao criar agendamento"
+      setError(message)
+      toast.error(message)
     }
   }
 
@@ -143,12 +139,6 @@ export function NewAppointmentForm() {
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {success && (
-            <Alert>
-              <AlertDescription>Agendamento criado com sucesso!</AlertDescription>
             </Alert>
           )}
         </CardContent>

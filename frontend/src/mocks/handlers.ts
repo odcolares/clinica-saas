@@ -82,13 +82,13 @@ export const handlers = [
   http.get(`${API_BASE}/leads`, ({ request }) => {
     const url = new URL(request.url)
     const status = url.searchParams.get("status")
-    const origin = url.searchParams.get("origin")
+    const source = url.searchParams.get("source")
     const search = url.searchParams.get("search")
     const page = parseInt(url.searchParams.get("page") || "1")
 
     let filtered = [...leads]
     if (status) filtered = filtered.filter((l) => l.status === status)
-    if (origin) filtered = filtered.filter((l) => l.origin === origin)
+    if (source) filtered = filtered.filter((l) => l.source === source)
     if (search) {
       const s = search.toLowerCase()
       filtered = filtered.filter((l) => l.name.toLowerCase().includes(s) || l.email?.toLowerCase().includes(s))
@@ -104,12 +104,14 @@ export const handlers = [
       name: body.name,
       email: body.email || null,
       phone: body.phone || null,
-      origin: body.origin,
-      status: "novo",
+      document: null,
+      source: body.source,
+      status: "NEW",
       source_detail: body.source_detail || null,
       assigned_to: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      notes: [],
     }
     leads.push(newLead)
     return HttpResponse.json<Lead>(newLead, { status: 201 })
@@ -141,7 +143,7 @@ export const handlers = [
   http.post(`${API_BASE}/leads/:id/convert`, ({ params }) => {
     const lead = leads.find((l) => l.id === params.id)
     if (!lead) return HttpResponse.json({ detail: "Lead não encontrado" }, { status: 404 })
-    lead.status = "convertido"
+    lead.status = "CONVERTED"
     lead.updated_at = new Date().toISOString()
 
     const newCustomer: Customer = {
@@ -213,7 +215,7 @@ export const handlers = [
         type: "visit" as const,
         description: `Consulta: ${services.find((s) => s.id === a.service)?.name || a.service}`,
         timestamp: a.start_time,
-        created_by: a.professional,
+        author: a.professional,
       }))
 
     return HttpResponse.json(timeline)
@@ -267,7 +269,7 @@ export const handlers = [
       service: body.service,
       start_time: body.start_time,
       end_time: new Date(new Date(body.start_time).getTime() + (service?.duration_minutes || 60) * 60000).toISOString(),
-      status: "agendado",
+      status: "scheduled",
       notes: body.notes || null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -293,7 +295,7 @@ export const handlers = [
   http.post(`${API_BASE}/appointments/:id/cancel`, ({ params }) => {
     const apt = appointments.find((a) => a.id === params.id)
     if (!apt) return HttpResponse.json({ detail: "Agendamento não encontrado" }, { status: 404 })
-    apt.status = "cancelado"
+    apt.status = "cancelled"
     apt.updated_at = new Date().toISOString()
     return HttpResponse.json<Appointment>(apt)
   }),

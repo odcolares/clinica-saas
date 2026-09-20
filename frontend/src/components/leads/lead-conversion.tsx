@@ -98,7 +98,7 @@ export function LeadConversion({ lead, trigger, onConverted }: LeadConversionPro
           <Button variant="outline" onClick={() => setOpen(false)} disabled={isConverting}>
             Cancelar
           </Button>
-          <Button onClick={handleConvert} disabled={isConverting || lead.status === "convertido"}>
+          <Button onClick={handleConvert} disabled={isConverting || lead.status === "CONVERTED"}>
             {isConverting ? "Convertendo..." : "Confirmar Conversão"}
           </Button>
         </DialogFooter>
