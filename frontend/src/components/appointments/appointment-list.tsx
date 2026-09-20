@@ -1,26 +1,28 @@
 "use client"
 
-import { useAppointments, useProfessionals, useServices } from "@/hooks/use-appointments"
+import { useAppointments, useProfessionals, useServices, cancelAppointment, confirmAppointment } from "@/hooks/use-appointments"
 import type { Appointment } from "@/types/api"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Clock, User, UserRound } from "lucide-react"
+import { Clock, User, UserRound, CheckCircle, XCircle, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale/pt-BR"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 const STATUS_LABELS: Record<string, string> = {
-  agendado: "Agendado",
-  confirmado: "Confirmado",
-  cancelado: "Cancelado",
-  concluido: "Concluído",
+  scheduled: "Agendado",
+  confirmed: "Confirmado",
+  cancelled: "Cancelado",
+  completed: "Concluído",
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  agendado: "bg-blue-100 text-blue-800",
-  confirmado: "bg-green-100 text-green-800",
-  cancelado: "bg-red-100 text-red-800",
-  concluido: "bg-gray-100 text-gray-800",
+  scheduled: "bg-blue-100 text-blue-800",
+  confirmed: "bg-green-100 text-green-800",
+  cancelled: "bg-red-100 text-red-800",
+  completed: "bg-gray-100 text-gray-800",
 }
 
 export function AppointmentList({
@@ -78,6 +80,34 @@ function AppointmentCard({ appointment, professionalName, serviceName }: Appoint
   const status = appointment.status
   const statusClass = STATUS_COLORS[status] ?? "bg-gray-100 text-gray-800"
   const statusLabel = STATUS_LABELS[status] ?? status
+  const [actionLoading, setActionLoading] = useState<string | null>(null)
+
+  const canConfirm = status === "scheduled"
+  const canCancel = status === "scheduled" || status === "confirmed"
+
+  const handleConfirm = async () => {
+    setActionLoading("confirm")
+    try {
+      await confirmAppointment(appointment.id)
+      toast.success("Agendamento confirmado com sucesso!")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao confirmar agendamento")
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleCancel = async () => {
+    setActionLoading("cancel")
+    try {
+      await cancelAppointment(appointment.id)
+      toast.success("Agendamento cancelado com sucesso!")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao cancelar agendamento")
+    } finally {
+      setActionLoading(null)
+    }
+  }
 
   return (
     <Card>
@@ -103,6 +133,52 @@ function AppointmentCard({ appointment, professionalName, serviceName }: Appoint
           <span className="text-sm">Profissional: {professionalName}</span>
         </div>
         {appointment.notes && <p className="text-sm text-muted-foreground">{appointment.notes}</p>}
+        {(canConfirm || canCancel) && (
+          <div className="flex gap-2 pt-2 border-t">
+            {canConfirm && (
+              <Button
+                variant="default"
+                size="sm"
+                className="flex-1"
+                onClick={handleConfirm}
+                disabled={actionLoading !== null}
+              >
+                {actionLoading === "confirm" ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Confirmando...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Confirmar
+                  </>
+                )}
+              </Button>
+            )}
+            {canCancel && (
+              <Button
+                variant="destructive"
+                size="sm"
+                className="flex-1"
+                onClick={handleCancel}
+                disabled={actionLoading !== null}
+              >
+                {actionLoading === "cancel" ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Cancelando...
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Cancelar
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   )
