@@ -14,8 +14,8 @@ const dashboardData = {
   totalRevenue: cashTransactions
     .filter((t) => t.type === "income")
     .reduce((sum, t) => sum + t.amount, 0),
-  totalCustomers: leads.filter((l) => l.status === "convertido").length,
-  activeLeads: leads.filter((l) => l.status !== "convertido" && l.status !== "desativado").length,
+  totalCustomers: leads.filter((l) => l.status === "CONVERTED").length,
+  activeLeads: leads.filter((l) => l.status !== "CONVERTED" && l.status !== "LOST").length,
   todaysAppointments: appointments.filter((a) =>
     a.start_time.startsWith(format(now, "yyyy-MM-dd"))
   ).length,
