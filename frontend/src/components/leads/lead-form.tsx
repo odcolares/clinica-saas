@@ -3,7 +3,7 @@
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Lead, LeadCreateRequest, LeadOrigin } from "@/types/api"
+import { Lead, LeadCreateRequest } from "@/types/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -18,27 +18,31 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
 
+const sourceEnum = ["google", "facebook", "indicacao", "site", "other"] as const
+
 const leadSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   email: z.string().email("E-mail inválido").optional().or(z.literal("")),
   phone: z.string().optional(),
-  origin: z.enum(["google", "facebook", "indicacao", "site", "outro"]),
+  source: z.enum(sourceEnum),
   source_detail: z.string().optional(),
 })
 
 type LeadFormData = z.infer<typeof leadSchema>
+type SourceValue = typeof sourceEnum[number]
 
-const ORIGIN_LABELS: Record<LeadOrigin, string> = {
+const SOURCE_LABELS: Record<SourceValue, string> = {
   google: "Google",
   facebook: "Facebook",
   indicacao: "Indicação",
   site: "Site",
-  outro: "Outro",
+  other: "Outro",
 }
 
-const ORIGIN_OPTIONS: { value: LeadOrigin; label: string }[] = Object.entries(
-  ORIGIN_LABELS
-).map(([value, label]) => ({ value: value as LeadOrigin, label }))
+const SOURCE_OPTIONS: { value: SourceValue; label: string }[] = sourceEnum.map((value) => ({
+  value,
+  label: SOURCE_LABELS[value],
+}))
 
 interface LeadFormProps {
   initialData?: Partial<Lead>
@@ -64,7 +68,7 @@ export function LeadForm({
       name: initialData?.name ?? "",
       email: initialData?.email ?? "",
       phone: initialData?.phone ?? "",
-      origin: initialData?.origin ?? "site",
+      source: (initialData?.source as SourceValue) ?? "site",
       source_detail: initialData?.source_detail ?? "",
     },
   })
@@ -74,7 +78,7 @@ export function LeadForm({
       name: data.name,
       email: data.email || null,
       phone: data.phone || null,
-      origin: data.origin,
+      source: data.source,
       source_detail: data.source_detail || null,
     }
     await onSubmit(payload)
@@ -127,24 +131,24 @@ export function LeadForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="origin">Origem *</Label>
+            <Label htmlFor="source">Origem *</Label>
             <Select
-              value={initialData?.origin ?? "site"}
-              onValueChange={(value) => setValue("origin", value as LeadOrigin)}
+              value={initialData?.source ?? "site"}
+              onValueChange={(value) => setValue("source", value as SourceValue)}
             >
-              <SelectTrigger id="origin">
+              <SelectTrigger id="source">
                 <SelectValue placeholder="Selecione a origem" />
               </SelectTrigger>
               <SelectContent>
-                {ORIGIN_OPTIONS.map((opt) => (
+                {SOURCE_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {errors.origin && (
-              <p className="text-sm text-destructive">{errors.origin.message}</p>
+            {errors.source && (
+              <p className="text-sm text-destructive">{errors.source.message}</p>
             )}
           </div>
 

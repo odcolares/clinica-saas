@@ -52,7 +52,7 @@ describe("LeadForm", () => {
         name: "Test Lead",
         email: "test@example.com",
         phone: "11999999999",
-        origin: "site",
+        source: "site",
         source_detail: "From Google Ads",
       } as LeadCreateRequest)
     })
