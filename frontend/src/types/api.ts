@@ -5,9 +5,8 @@
 
 // ─── Enums ───────────────────────────────────────────────
 
-export type LeadStatus = "novo" | "contatado" | "qualificado" | "convertido" | "desativado"
-export type LeadOrigin = "google" | "facebook" | "indicacao" | "site" | "outro"
-export type AppointmentStatus = "agendado" | "confirmado" | "cancelado" | "concluido"
+export type LeadStatus = "NEW" | "CONTACTED" | "QUALIFIED" | "CONVERTED" | "LOST"
+export type AppointmentStatus = "scheduled" | "confirmed" | "cancelled" | "completed"
 export type InteractionType = "call" | "email" | "visit" | "note"
 
 // ─── Auth ────────────────────────────────────────────────
@@ -50,7 +49,8 @@ export interface Lead {
   name: string
   email: string | null
   phone: string | null
-  origin: LeadOrigin
+  document?: string | null
+  source: string
   status: LeadStatus
   source_detail?: string | null
   assigned_to?: string | null
@@ -62,8 +62,8 @@ export interface Lead {
 export interface LeadNote {
   id: string
   lead: string
-  content: string
-  created_by: string
+  body: string
+  author: string
   created_at: string
 }
 
@@ -71,12 +71,20 @@ export interface LeadCreateRequest {
   name: string
   email?: string | null
   phone?: string | null
-  origin: LeadOrigin
+  document?: string | null
+  source: string
   source_detail?: string | null
 }
 
 export interface LeadStatusUpdate {
   status: LeadStatus
+  reason?: string
+}
+
+export interface LeadConversionResponse {
+  customer: Customer
+  created: boolean
+  lead_id: number
 }
 
 export interface Customer {
@@ -94,8 +102,9 @@ export interface Customer {
 export interface CustomerContact {
   id: string
   customer: string
-  type: "phone" | "email" | "whatsapp"
+  kind: "phone" | "email" | "whatsapp"
   value: string
+  label?: string
   is_primary: boolean
   created_at: string
 }
@@ -103,30 +112,31 @@ export interface CustomerContact {
 export interface CustomerAddress {
   id: string
   customer: string
+  label?: string
   street: string
   number: string
   complement?: string | null
-  neighborhood: string
-  city: string
-  state: string
-  zip_code: string
+  district: string
+  zipcode: string
+  country?: string
+  is_primary: boolean
   created_at: string
 }
 
 export interface CustomerNote {
   id: string
   customer: string
-  content: string
-  created_by: string
+  body: string
+  author: string
   created_at: string
 }
 
 export interface TimelineEntry {
   id: string
-  type: InteractionType
+  kind: InteractionType
   description: string
   timestamp: string
-  created_by?: string
+  author?: string
 }
 
 // ─── Quotes ──────────────────────────────────────────────
@@ -241,7 +251,7 @@ export interface PaginatedResponse<T> {
 
 export interface LeadFilters {
   status?: LeadStatus
-  origin?: LeadOrigin
+  source?: string
   date_start?: string
   date_end?: string
   search?: string
@@ -252,4 +262,23 @@ export interface AppointmentFilters {
   date?: string
   professional?: string
   status?: AppointmentStatus
+}
+
+export interface AvailabilitySlot {
+  start: string
+  end: string
+  available: boolean
+}
+
+export interface ProfessionalAvailability {
+  professional: string
+  professional_name: string
+  date: string
+  slots: AvailabilitySlot[]
+}
+
+export interface AvailabilityFilters {
+  professional?: string
+  date: string
+  service?: string
 }
