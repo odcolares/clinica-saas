@@ -43,12 +43,12 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 - [x] Documentar endpoints iniciais
 
 ### Odair — Frontend Setup
-- [ ] Setup Next.js + TypeScript strict
-- [ ] ESLint + Prettier configurados
-- [ ] Tailwind CSS + shadcn/ui instalados
-- [ ] Auth page (login, recuperação senha)
-- [ ] Configurar API client (axios/fetch com interceptors)
-- [ ] Layout base (sidebar, header, footer)
+- [x] Setup Next.js + TypeScript strict
+- [x] ESLint + Prettier configurados
+- [x] Tailwind CSS + shadcn/ui instalados
+- [x] Auth page (login, recuperação senha)
+- [x] Configurar API client (axios/fetch com interceptors)
+- [x] Layout base (sidebar, header, footer)
 
 ---
 
