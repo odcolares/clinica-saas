@@ -114,15 +114,15 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 **Objetivo:** Atendimento via Telegram integrado ao CRM.
 
 ### Marcos — Backend API
-- [ ] Telegram Bot webhook
-- [ ] Model Conversation + ConversationMessage
-- [ ] Normalização de mensagens
-- [ ] Atribuição para atendente
-- [ ] Integração com CRM (lead criado a partir de mensagem)
-- [ ] Redis para cache de sessões
-- [ ] Rate limiting por canal
-- [ ] Testes de webhook (simulação)
-- [ ] Adapter pattern para canais futuros (WhatsApp)
+- [x] Telegram Bot webhook
+- [x] Model Conversation + ConversationMessage
+- [x] Normalização de mensagens
+- [x] Atribuição para atendente
+- [x] Integração com CRM (lead criado a partir de mensagem)
+- [x] Redis para cache de sessões
+- [x] Rate limiting por canal
+- [x] Testes de webhook (simulação)
+- [x] Adapter pattern para canais futuros (WhatsApp)
 
 ### Odair — Frontend
 - [ ] Interface de atendimento ao vivo

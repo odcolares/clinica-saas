@@ -42,6 +42,22 @@
 - POST /appointments/{id}/reschedule
 - GET /appointments
 
+## Omnichannel
+- GET /conversations — lista conversas (filtros: channel, status, assigned_to, customer, lead)
+- GET /conversations/{id}
+- GET /conversations/{id}/messages — mensagens da conversa
+- POST /conversations/{id}/assign — atribui a um atendente (RBAC guardian)
+- POST /conversations/{id}/reply — envia resposta pelo adapter do canal
+- GET /messages — lista mensagens das conversas visíveis
+- POST /omnichannel/telegram/webhook — webhook público do Telegram
+
+Regras do webhook do Telegram:
+- Autenticidade: segredo POR TENANT (`TELEGRAM_WEBHOOK_SECRET_<SCHEMA>`) comparado ao header `X-Telegram-Bot-Api-Secret-Token` (tempo constante); o segredo global só autoriza como fallback explícito (`TELEGRAM_ALLOW_GLOBAL_WEBHOOK_SECRET=True`). Sem segredo do tenant → 403.
+- Tenant: resolvido pelo header `x-tenant-id` (hint de roteamento, sem JWT). Sem tenant → 400.
+- Idempotência: por `telegram_message_id`; reentregas não duplicam mensagens.
+- Resposta: 200 rápido `{ok, conversation, message, duplicate}`.
+- Rate limiting: escopo `telegram` (por IP), configurável via `THROTTLE_TELEGRAM`.
+
 ## Finance
 - POST /payments
 - POST /cash-transactions
