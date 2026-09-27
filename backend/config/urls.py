@@ -8,4 +8,5 @@ urlpatterns = [
     path("api/v1/", include("apps.common.urls")),
     path("api/v1/", include("apps.crm.urls")),
     path("api/v1/", include("apps.scheduling.urls")),
+    path("api/v1/", include("apps.omnichannel.urls")),
 ]

@@ -73,6 +73,9 @@ REST_FRAMEWORK = {
         "login": os.getenv("THROTTLE_LOGIN", "10/min"),
         "signup": os.getenv("THROTTLE_SIGNUP", "5/min"),
         "password_reset": os.getenv("THROTTLE_PASSWORD_RESET", "5/min"),
+        # Rate limiting por canal (ETAPA 3): webhook do Telegram é anônimo, então
+        # o ScopedRateThrottle cai em chave por IP (proteção contra replay/abuso).
+        "telegram": os.getenv("THROTTLE_TELEGRAM", "30/min"),
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "EXCEPTION_HANDLER": "apps.common.exceptions.tenant_aware_exception_handler",
