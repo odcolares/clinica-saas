@@ -298,7 +298,7 @@ export interface Conversation {
   assigned_to: string | null
   customer: string | null
   lead: string | null
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
   created_at: string
   updated_at: string
 }
@@ -311,7 +311,7 @@ export interface ConversationMessage {
   body: string
   normalized_body: string
   telegram_message_id: string | null
-  payload: Record<string, any>
+  payload: Record<string, unknown>
   created_at: string
 }
 
