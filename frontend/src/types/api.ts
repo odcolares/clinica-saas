@@ -282,3 +282,61 @@ export interface AvailabilityFilters {
   date: string
   service?: string
 }
+
+// ─── Omnichannel (Etapa 3) ────────────────────────────────
+
+export type ConversationChannel = "telegram" | "whatsapp"
+export type ConversationStatus = "open" | "assigned" | "closed"
+export type MessageDirection = "inbound" | "outbound"
+export type MessageSender = "customer" | "agent" | "system"
+
+export interface Conversation {
+  id: string
+  channel: ConversationChannel
+  external_chat_id: string
+  status: ConversationStatus
+  assigned_to: string | null
+  customer: string | null
+  lead: string | null
+  metadata: Record<string, any>
+  created_at: string
+  updated_at: string
+}
+
+export interface ConversationMessage {
+  id: string
+  conversation: string
+  direction: MessageDirection
+  sender_kind: MessageSender
+  body: string
+  normalized_body: string
+  telegram_message_id: string | null
+  payload: Record<string, any>
+  created_at: string
+}
+
+export interface ConversationFilters {
+  channel?: ConversationChannel
+  status?: ConversationStatus
+  assigned_to?: string
+  customer?: string
+  lead?: string
+  search?: string
+}
+
+export interface OutboundMessageRequest {
+  body: string
+}
+
+export interface AssignConversationRequest {
+  assigned_to: string
+}
+
+export interface Template {
+  id: string
+  name: string
+  channel: string
+  body: string
+  active: boolean
+  created_at: string
+}
