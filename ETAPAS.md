@@ -125,12 +125,12 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 - [x] Adapter pattern para canais futuros (WhatsApp)
 
 ### Odair — Frontend
-- [ ] Interface de atendimento ao vivo
-- [ ] Lista de conversas
-- [ ] Mensagens em tempo real (polling)
-- [ ] Mensagens automáticas (templates)
-- [ ] Badge de status do agente
-- [ ] Painel de gestão de canais
+- [x] Interface de atendimento ao vivo
+- [x] Lista de conversas
+- [x] Mensagens em tempo real (polling)
+- [x] Mensagens automáticas (templates)
+- [x] Badge de status do agente
+- [x] Painel de gestão de canais
 
 ---
 
@@ -271,3 +271,4 @@ Etapa 5 (Configurações) ◄─────────────────
 > **Criado:** 2026-01-15
 > **Responsáveis:** Marcos (Backend/DB) + Odair (Frontend/UI)
 > **Atualização:** 2026-09-20 — Etapa 2 Frontend (Agenda) concluída: calendário FullCalendar, formulário agendamento, disponibilidade profissionais, confirmação/cancelamento, responsividade mobile
+> **Atualização:** 2026-09-30 — Etapa 3 Frontend (Omnichannel) concluída: interface de atendimento ao vivo (conversation-chat), lista de conversas (conversation-list), polling 8s, templates offline via localStorage, badge de status do agente, painel de gestão de canais. 10 testes vitest passando.
