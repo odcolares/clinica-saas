@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import environ
@@ -18,6 +19,9 @@ env = environ.Env(
     SENTRY_DSN=(str, ""),
     SENTRY_ENVIRONMENT=(str, "development"),
     SENTRY_RELEASE=(str, "etapa-0"),
+    TELEGRAM_BOT_TOKEN=(str, ""),
+    TELEGRAM_WEBHOOK_SECRET=(str, ""),
+    TELEGRAM_ALLOW_GLOBAL_WEBHOOK_SECRET=(bool, False),
 )
 
 environ.Env.read_env(BASE_DIR / ".env", overwrite=False)
@@ -25,6 +29,31 @@ environ.Env.read_env(BASE_DIR / ".env", overwrite=False)
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="django-insecure-etapa0-dev-only")
 DEBUG = env("DJANGO_DEBUG")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
+
+# Credenciais de integração (nunca no código; vazio por padrão em dev).
+TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN")
+# Segredo global: NÃO autoriza um tenant por si só. Só é aceito como fallback se
+# TELEGRAM_ALLOW_GLOBAL_WEBHOOK_SECRET=True (desligado por padrão → fail-closed).
+TELEGRAM_WEBHOOK_SECRET = env("TELEGRAM_WEBHOOK_SECRET")
+TELEGRAM_ALLOW_GLOBAL_WEBHOOK_SECRET = env("TELEGRAM_ALLOW_GLOBAL_WEBHOOK_SECRET")
+
+
+def _tenant_webhook_secrets() -> dict[str, str]:
+    """Segredos de webhook por tenant: ``TELEGRAM_WEBHOOK_SECRET_<SCHEMA>``.
+
+    Vincula o segredo ao schema do tenant (ex.: ``TELEGRAM_WEBHOOK_SECRET_CLINICA_A``
+    → ``clinica_a``), impedindo que um segredo compartilhado escreva em outro
+    tenant via header ``x-tenant-id``.
+    """
+    prefix = "TELEGRAM_WEBHOOK_SECRET_"
+    return {
+        key[len(prefix) :].lower(): value
+        for key, value in os.environ.items()
+        if key.startswith(prefix) and len(key) > len(prefix) and value
+    }
+
+
+TELEGRAM_WEBHOOK_SECRETS = _tenant_webhook_secrets()
 
 if not DEBUG and SECRET_KEY.startswith("django-insecure-"):
     raise RuntimeError("DJANGO_SECRET_KEY real é obrigatório quando DEBUG=False.")
@@ -63,6 +92,7 @@ TENANT_APPS = [
     "apps.common",
     "apps.crm",
     "apps.scheduling",
+    "apps.omnichannel",
 ]
 
 # contenttypes aparece em SHARED_APPS e TENANT_APPS (padrão exigido pelo
