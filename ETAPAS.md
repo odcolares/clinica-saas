@@ -141,14 +141,14 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 **Objetivo:** Automação com IA para triagem de leads e respostas.
 
 ### Marcos — Backend API
-- [ ] Integração OpenAI API (classificação de intenção)
-- [ ] Respostas automáticas (RAG - FAQs)
-- [ ] Resumo de conversa (LLM)
-- [ ] Extração de dados do cliente (nome, telefone, serviço)
-- [ ] Circuit breaker para OpenAI
-- [ ] Cache de respostas (Redis)
-- [ ] Logs de interação com IA (audit)
-- [ ] Prompt management (templates parametrizáveis)
+- [x] Integração OpenAI API (classificação de intenção)
+- [x] Respostas automáticas (RAG - FAQs)
+- [x] Resumo de conversa (LLM)
+- [x] Extração de dados do cliente (nome, telefone, serviço)
+- [x] Circuit breaker para OpenAI
+- [x] Cache de respostas (Redis)
+- [x] Logs de interação com IA (audit)
+- [x] Prompt management (templates parametrizáveis)
 
 ### Odair — Frontend
 - [ ] Badge "IA respondeu" nas mensagens
