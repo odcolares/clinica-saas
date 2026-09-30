@@ -17,6 +17,10 @@ import type {
   LoginRequest,
   LoginResponse,
   RefreshRequest,
+  Conversation,
+  ConversationMessage,
+  AssignConversationRequest,
+  OutboundMessageRequest,
 } from "@/types/api"
 import {
   leads,
@@ -29,6 +33,8 @@ import {
   cashTransactions,
   authTokens,
   currentUser,
+  conversations,
+  conversationMessages,
   generateId,
   paginate,
 } from "./data"
@@ -442,5 +448,80 @@ export const handlers = [
   http.post(`${API_BASE}/reconciliations`, async ({ request }) => {
     const body = await request.json() as Record<string, unknown>
     return HttpResponse.json({ id: generateId("recon"), ...body }, { status: 201 })
+  }),
+
+  // ─── Omnichannel (Etapa 3) ───────────────────────────────
+  http.get(`${API_BASE}/conversations`, ({ request }) => {
+    const url = new URL(request.url)
+    const channel = url.searchParams.get("channel")
+    const status = url.searchParams.get("status")
+    const assigned_to = url.searchParams.get("assigned_to")
+    const search = url.searchParams.get("search")
+    const page = parseInt(url.searchParams.get("page") || "1")
+
+    let filtered = [...conversations]
+    if (channel) filtered = filtered.filter((c) => c.channel === channel)
+    if (status) filtered = filtered.filter((c) => c.status === status)
+    if (assigned_to) filtered = filtered.filter((c) => c.assigned_to === assigned_to)
+    if (search) {
+      const s = search.toLowerCase()
+      filtered = filtered.filter(
+        (c) =>
+          c.external_chat_id.toLowerCase().includes(s) ||
+          (c.metadata.display_name || "").toLowerCase().includes(s),
+      )
+    }
+
+    return HttpResponse.json<PaginatedResponse<Conversation>>(
+      paginate(filtered, page, 20),
+    )
+  }),
+
+  http.get(`${API_BASE}/conversations/:id`, ({ params }) => {
+    const conv = conversations.find((c) => c.id === params.id)
+    if (!conv) return HttpResponse.json({ detail: "Conversa não encontrada" }, { status: 404 })
+    return HttpResponse.json<Conversation>(conv)
+  }),
+
+  http.get(`${API_BASE}/conversations/:id/messages`, ({ request, params }) => {
+    const url = new URL(request.url)
+    const page = parseInt(url.searchParams.get("page") || "1")
+    const msgs = conversationMessages
+      .filter((m) => m.conversation === params.id)
+      .sort((a, b) => (a.created_at > b.created_at ? 1 : -1))
+
+    return HttpResponse.json<PaginatedResponse<ConversationMessage>>(
+      paginate(msgs, page, 50),
+    )
+  }),
+
+  http.post(`${API_BASE}/conversations/:id/assign`, async ({ params, request }) => {
+    const conv = conversations.find((c) => c.id === params.id)
+    if (!conv) return HttpResponse.json({ detail: "Conversa não encontrada" }, { status: 404 })
+    const body = await request.json() as AssignConversationRequest
+    conv.assigned_to = body.assigned_to
+    conv.status = "assigned"
+    conv.updated_at = new Date().toISOString()
+    return HttpResponse.json<Conversation>(conv)
+  }),
+
+  http.post(`${API_BASE}/conversations/:id/reply`, async ({ params, request }) => {
+    const conv = conversations.find((c) => c.id === params.id)
+    if (!conv) return HttpResponse.json({ detail: "Conversa não encontrada" }, { status: 404 })
+    const body = await request.json() as OutboundMessageRequest
+    const newMsg: ConversationMessage = {
+      id: generateId("msg"),
+      conversation: params.id as string,
+      direction: "outbound",
+      sender_kind: "agent",
+      body: body.body,
+      normalized_body: body.body,
+      telegram_message_id: null,
+      payload: {},
+      created_at: new Date().toISOString(),
+    }
+    conversationMessages.push(newMsg)
+    conv.updated_at = new Date().toISOString()
+    return HttpResponse.json<ConversationMessage>(newMsg, { status: 201 })
   }),
 ]

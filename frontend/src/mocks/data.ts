@@ -11,6 +11,9 @@ import type {
   CashTransaction,
   LeadStatus,
   AppointmentStatus,
+  Conversation,
+  ConversationMessage,
+  Template,
 } from "@/types/api"
 
 // ─── Leads ───────────────────────────────────────────────
@@ -411,6 +414,140 @@ export const currentUser = {
   role: "admin" as const,
   tenant: "clinica-saas",
 }
+
+// ─── Omnichannel (Etapa 3) ────────────────────────────────
+
+export const conversations: Conversation[] = [
+  {
+    id: "conv-001",
+    channel: "telegram",
+    external_chat_id: "tg-123456",
+    status: "open",
+    assigned_to: null,
+    customer: "cust-001",
+    lead: null,
+    metadata: {
+      phone: "(11) 98765-4321",
+      display_name: "Ana Silva",
+    },
+    created_at: "2025-09-19T09:00:00Z",
+    updated_at: "2025-09-19T09:05:00Z",
+  },
+  {
+    id: "conv-002",
+    channel: "telegram",
+    external_chat_id: "tg-789012",
+    status: "assigned",
+    assigned_to: "user-001",
+    customer: "cust-002",
+    lead: null,
+    metadata: {
+      phone: "(11) 97777-6666",
+      display_name: "Fernanda Rocha",
+    },
+    created_at: "2025-09-18T14:00:00Z",
+    updated_at: "2025-09-18T14:30:00Z",
+  },
+  {
+    id: "conv-003",
+    channel: "telegram",
+    external_chat_id: "tg-345678",
+    status: "open",
+    assigned_to: null,
+    customer: null,
+    lead: null,
+    metadata: {
+      phone: "(11) 95555-4444",
+      display_name: "Lead Novo",
+    },
+    created_at: "2025-09-20T10:00:00Z",
+    updated_at: "2025-09-20T10:00:00Z",
+  },
+  {
+    id: "conv-004",
+    channel: "telegram",
+    external_chat_id: "tg-901234",
+    status: "closed",
+    assigned_to: "user-001",
+    customer: "cust-003",
+    lead: null,
+    metadata: {
+      phone: "(11) 94444-3333",
+      display_name: "Gustavo Pereira",
+    },
+    created_at: "2025-09-17T08:00:00Z",
+    updated_at: "2025-09-17T09:00:00Z",
+  },
+]
+
+export const conversationMessages: ConversationMessage[] = [
+  {
+    id: "msg-001",
+    conversation: "conv-001",
+    direction: "inbound",
+    sender_kind: "customer",
+    body: "Olá, gostaria de marcar uma consulta.",
+    normalized_body: "olá gostaria de marcar uma consulta",
+    telegram_message_id: "tg-msg-001",
+    payload: {},
+    created_at: "2025-09-19T09:00:00Z",
+  },
+  {
+    id: "msg-002",
+    conversation: "conv-001",
+    direction: "outbound",
+    sender_kind: "agent",
+    body: "Olá Ana! Fico bem, qual horário você prefere?",
+    normalized_body: "olá ana fico bem qual horário você prefere",
+    telegram_message_id: "tg-msg-002",
+    payload: {},
+    created_at: "2025-09-19T09:01:00Z",
+  },
+  {
+    id: "msg-003",
+    conversation: "conv-001",
+    direction: "inbound",
+    sender_kind: "customer",
+    body: "Quarta-feira à tarde, por favor.",
+    normalized_body: "quarta-feira à tarde por favor",
+    telegram_message_id: "tg-msg-003",
+    payload: {},
+    created_at: "2025-09-19T09:02:00Z",
+  },
+  {
+    id: "msg-004",
+    conversation: "conv-002",
+    direction: "inbound",
+    sender_kind: "customer",
+    body: "Preciso reagendar minha limpeza.",
+    normalized_body: "preciso reagendar minha limpeza",
+    telegram_message_id: "tg-msg-004",
+    payload: {},
+    created_at: "2025-09-18T14:00:00Z",
+  },
+  {
+    id: "msg-005",
+    conversation: "conv-002",
+    direction: "outbound",
+    sender_kind: "agent",
+    body: "Olá Fernanda, sem problema! Vou ver os horários livres.",
+    normalized_body: "olá fernanda sem problema vou ver os horários livres",
+    telegram_message_id: "tg-msg-005",
+    payload: {},
+    created_at: "2025-09-18T14:05:00Z",
+  },
+  {
+    id: "msg-006",
+    conversation: "conv-003",
+    direction: "inbound",
+    sender_kind: "customer",
+    body: "Boa tarde, tenho uma dor no dente.",
+    normalized_body: "boa tarde tenho uma dor no dente",
+    telegram_message_id: "tg-msg-006",
+    payload: {},
+    created_at: "2025-09-20T10:00:00Z",
+  },
+]
 
 // ─── Helpers ─────────────────────────────────────────────
 
