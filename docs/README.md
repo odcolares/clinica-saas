@@ -11,6 +11,8 @@ This directory contains auto-generated and manually maintained API documentation
 
 - `API-FUNDACAO.md` — Endpoints da fundação (ETAPA 0): health, signup, auth JWT
 - `API-CRM.md` — Endpoints do CRM (ETAPA 1): leads, customers, contatos, endereços, notas, timeline, tags
+- `API-SCHEDULING.md` — Endpoints da Agenda (ETAPA 2): profissionais, serviços, agendamentos, disponibilidade
+- `API-OMNICHANNEL.md` — Endpoints do Omnichannel (ETAPA 3): conversas, mensagens, atribuição, resposta, webhook Telegram
 - `Projeto_SaaS/architecture/API.md` — Contrato canônico de alto nível
 
 ## Quick Start
