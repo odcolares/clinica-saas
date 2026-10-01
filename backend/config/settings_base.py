@@ -22,6 +22,13 @@ env = environ.Env(
     TELEGRAM_BOT_TOKEN=(str, ""),
     TELEGRAM_WEBHOOK_SECRET=(str, ""),
     TELEGRAM_ALLOW_GLOBAL_WEBHOOK_SECRET=(bool, False),
+    OPENAI_API_KEY=(str, ""),
+    OPENAI_TIMEOUT_SECONDS=(float, 30.0),
+    OPENAI_MAX_CONNECTIONS=(int, 20),
+    OPENAI_MAX_KEEPALIVE_CONNECTIONS=(int, 10),
+    OPENAI_BREAKER_FAIL_MAX=(int, 5),
+    OPENAI_BREAKER_RESET_TIMEOUT=(int, 30),
+    LLM_CACHE_TTL_SECONDS=(int, 3600),
 )
 
 environ.Env.read_env(BASE_DIR / ".env", overwrite=False)
@@ -54,6 +61,15 @@ def _tenant_webhook_secrets() -> dict[str, str]:
 
 
 TELEGRAM_WEBHOOK_SECRETS = _tenant_webhook_secrets()
+
+# OpenAI / LLM (ETAPA 4) — segredos só via ambiente; vazio desativa chamadas.
+OPENAI_API_KEY = env("OPENAI_API_KEY")
+OPENAI_TIMEOUT_SECONDS = env("OPENAI_TIMEOUT_SECONDS")
+OPENAI_MAX_CONNECTIONS = env("OPENAI_MAX_CONNECTIONS")
+OPENAI_MAX_KEEPALIVE_CONNECTIONS = env("OPENAI_MAX_KEEPALIVE_CONNECTIONS")
+OPENAI_BREAKER_FAIL_MAX = env("OPENAI_BREAKER_FAIL_MAX")
+OPENAI_BREAKER_RESET_TIMEOUT = env("OPENAI_BREAKER_RESET_TIMEOUT")
+LLM_CACHE_TTL_SECONDS = env("LLM_CACHE_TTL_SECONDS")
 
 if not DEBUG and SECRET_KEY.startswith("django-insecure-"):
     raise RuntimeError("DJANGO_SECRET_KEY real é obrigatório quando DEBUG=False.")
@@ -93,6 +109,7 @@ TENANT_APPS = [
     "apps.crm",
     "apps.scheduling",
     "apps.omnichannel",
+    "apps.ai",
 ]
 
 # contenttypes aparece em SHARED_APPS e TENANT_APPS (padrão exigido pelo

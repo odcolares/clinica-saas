@@ -18,3 +18,6 @@ django-cors-headers==4.3.1
 gunicorn==23.0.0
 whitenoise==6.7.0
 python-dateutil==2.9.0
+openai==3.22.1
+httpx==0.28.1
+pybreaker==1.4.1
