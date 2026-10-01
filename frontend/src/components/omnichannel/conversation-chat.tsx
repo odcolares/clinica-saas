@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Send, Loader2 } from "lucide-react"
+import { Send, Loader2, RefreshCw } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -37,19 +37,43 @@ function MessageBubble({ message }: { message: ConversationMessage }) {
   const align = SENDER_ALIGN[message.sender_kind] || "start"
   const isAgent = message.sender_kind === "agent"
 
+  const isAiMessage = isAgent && message.payload?.[`ai-generated`] as boolean
+
   return (
     <div className={`flex ${align === "end" ? "justify-end" : "justify-start"}`}>
       <div
         className={`max-w-[75%] rounded-lg px-3 py-2 text-sm ${
           isAgent
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted"
+            ? isAiMessage
+              ? "bg-primary/20 text-primary border-primary"
+              : "bg-primary text-primary-foreground"
+              : "bg-muted"
         }`}
       >
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs font-medium">
             {SENDER_LABELS[message.sender_kind]}
           </span>
+          {isAiMessage && (
+            <>
+              <Badge
+                variant="subtle"
+                className="text-xs"
+                style={{ "--badge-color": "var(--primary)", "--border-color": "var(--primary)" }}
+              >
+                IA respondeu
+              </Badge>
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                className="ml-2 text-foreground/60 hover:text-foreground"
+                onClick={() => improveMessage(message)}
+                title="Melhorar resposta"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </>
+          )}
         </div>
         <p className="whitespace-pre-wrap break-words">{message.body}</p>
         <span className="text-[10px] opacity-70 mt-1 block">
@@ -88,6 +112,34 @@ export function ConversationChat({ conversation }: { conversation: Conversation 
       setInput("")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Falha ao enviar mensagem")
+    } finally {
+      setSending(false)
+    }
+  }
+
+  async function improveMessage(message: ConversationMessage) {
+    if (!confirm("Tem certeza que deseja melhorar esta resposta da IA?")) return
+    setSending(true)
+    try {
+      // Call the auto-reply endpoint with the conversation context
+      const res = await fetch(`/api/v1/ai/auto-reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation_id: conversation.id,
+          text: message.body,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.detail || "Falha ao melhorar resposta")
+      }
+      const data = await res.json()
+      toast.success("Resposta melhorada com sucesso!")
+      // TODO: Replace the message in the UI - would need state management
+      // for now, just show toast
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao melhorar resposta")
     } finally {
       setSending(false)
     }
