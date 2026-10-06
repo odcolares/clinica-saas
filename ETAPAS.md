@@ -37,7 +37,7 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 - [X] Signup de tenant (cria schema + usuário admin)
 - [X] Login + JWT (autenticação backend)
 - [X] Middleware de tenant context (`x-tenant-id`)
-- [X] Setup Docker local (PostgreSQL + Redis)
+- [X] Setup local (PostgreSQL + Redis)
 - [X] CI/CD pipeline (GitHub Actions → Railway + Vercel)
 - [X] Variáveis de ambiente (.env)
 - [X] Sentry + structlog configurado
@@ -178,13 +178,13 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 
 ### Marcos — Backend API
 
-- [ ] CRUD de Profissionais
-- [ ] Comissões e percentuais
-- [ ] Configurações do tenant (horários, branding)
-- [ ] Integrações externas (Google Calendar adapter)
-- [ ] Webhooks configuráveis
-- [ ] API keys management
-- [ ] Rate limiting por plano
+- [X] CRUD de Profissionais
+- [X] Comissões e percentuais
+- [X] Configurações do tenant (horários, branding)
+- [X] Integrações externas (Google Calendar adapter)
+- [X] Webhooks configuráveis
+- [X] API keys management
+- [X] Rate limiting por plano
 
 ### Odair — Frontend
 
@@ -286,3 +286,4 @@ Etapa 5 (Configurações) ◄─────────────────
 > **Atualização:** 2026-09-20 — Etapa 2 Frontend (Agenda) concluída: calendário FullCalendar, formulário agendamento, disponibilidade profissionais, confirmação/cancelamento, responsividade mobile
 > **Atualização:** 2026-09-30 — Etapa 3 Frontend (Omnichannel) concluída: interface de atendimento ao vivo (conversation-chat), lista de conversas (conversation-list), polling 8s, templates offline via localStorage, badge de status do agente, painel de gestão de canais. 10 testes vitest passando.
 > **Atualização:** 2026-10-01 — Etapa 4 Frontend (AI Assistant) concluída: badge "IA respondeu" nas mensagens, botão "Melhore esta resposta", painel de configuração de IA, histórico de interações da IA, ajustes de prompt (UI amigável). PR #8 mergeada para master.
+> **Atualização:** 2026-10-06 — Etapa 5 Backend (Marcos) concluída: app settings (TenantSettings, IntegrationConfig, WebhookEndpoint, ApiKey), comissões no Professional, adapter Google Calendar por tenant, PlanRateThrottle, 4 testes pytest passando, login ponta a ponta verificado em navegador real.
