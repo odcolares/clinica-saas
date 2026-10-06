@@ -17,11 +17,16 @@ This directory contains auto-generated and manually maintained API documentation
 
 ## Quick Start
 
-```bash
-cd backend
-cp .env.example .env
-docker compose up -d
+Modo tradicional local (sem containers): PostgreSQL local + Redis via WSL.
+
+```bat
+REM a partir da raiz do repo
+copy backend\.env.example backend\.env
+.\subir-aplicacao.bat
 ```
+
+O script garante role/database `clinica` no Postgres local, sobe o Redis
+no WSL, aplica `migrate_schemas` e abre backend (`:8000`) + frontend (`:3000`).
 
 API base: `http://localhost:8000/api/v1/`
 

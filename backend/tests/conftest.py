@@ -1,9 +1,9 @@
 """Configuração de testes para django-tenants + pytest-django.
 
 django-tenants não funciona com sqlite — exige PostgreSQL real.
-No CI, o serviço Postgres já fornece o banco. Localmente, rode:
-  docker compose up db redis
-e crie .env a partir de .env.example.
+No CI, o serviço Postgres já fornece o banco. Localmente, garanta o
+Postgres local (role/database `clinica`) + Redis no WSL rodando
+(`.\subir-aplicacao.bat` faz isso) e crie .env a partir de .env.example.
 """
 
 import pytest
