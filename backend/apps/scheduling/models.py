@@ -31,6 +31,11 @@ class TsTzRange(Func):
 class Professional(TimeStampedModel):
     """Profissional que executa serviços na agenda."""
 
+    class CommissionType(models.TextChoices):
+        NONE = "none", "Sem comissão"
+        PERCENT = "percent", "Percentual"
+        FIXED = "fixed", "Valor fixo"
+
     name = models.CharField(max_length=150)
     email = models.EmailField(blank=True)
     phone = models.CharField(max_length=32, blank=True)
@@ -39,6 +44,23 @@ class Professional(TimeStampedModel):
         help_text="Lista de especialidades separadas por vírgula.",
     )
     active = models.BooleanField(default=True)
+    commission_type = models.CharField(
+        max_length=16,
+        choices=CommissionType.choices,
+        default=CommissionType.NONE,
+    )
+    commission_percent = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=0,
+        validators=[MinValueValidator(0)],
+    )
+    commission_fixed = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        validators=[MinValueValidator(0)],
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,

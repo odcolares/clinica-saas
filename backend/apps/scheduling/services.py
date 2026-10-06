@@ -16,7 +16,7 @@ from django.db import IntegrityError, transaction
 from rest_framework.exceptions import ValidationError
 
 from apps.common.exceptions import Conflict
-from apps.scheduling.calendar import CalendarAdapter, NoopCalendarAdapter
+from apps.scheduling.calendar import CalendarAdapter, get_calendar_adapter
 from apps.scheduling.models import Appointment, Professional, Service
 
 logger = structlog.get_logger(__name__)
@@ -102,11 +102,11 @@ def sync_to_calendar(
 ) -> Appointment:
     """Sincroniza o agendamento com o calendário externo.
 
-    Usa ``NoopCalendarAdapter`` por padrão. Atualiza ``external_event_id``
+    Usa o adapter do tenant (Etapa 5) por padrão. Atualiza ``external_event_id``
     de forma idempotente.
     """
     if adapter is None:
-        adapter = NoopCalendarAdapter()
+        adapter = get_calendar_adapter()
 
     summary = f"{appointment.service.name} — {appointment.customer.name}"
     description = appointment.notes or ""

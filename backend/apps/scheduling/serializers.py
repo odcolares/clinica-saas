@@ -31,6 +31,9 @@ class ProfessionalSerializer(serializers.ModelSerializer):
             "specialties",
             "specialty_list",
             "active",
+            "commission_type",
+            "commission_percent",
+            "commission_fixed",
             "user",
             "created_at",
             "updated_at",
@@ -39,6 +42,20 @@ class ProfessionalSerializer(serializers.ModelSerializer):
 
     def get_specialty_list(self, obj) -> list[str]:
         return obj.specialty_list
+
+    def validate(self, attrs):
+        ctype = attrs.get("commission_type", getattr(self.instance, "commission_type", "none"))
+        percent = attrs.get("commission_percent", getattr(self.instance, "commission_percent", 0))
+        fixed = attrs.get("commission_fixed", getattr(self.instance, "commission_fixed", 0))
+        if ctype == "percent" and (percent is None or float(percent) < 0 or float(percent) > 100):
+            raise serializers.ValidationError(
+                {"commission_percent": "Percentual deve estar entre 0 e 100."}
+            )
+        if ctype == "fixed" and (fixed is None or float(fixed) < 0):
+            raise serializers.ValidationError(
+                {"commission_fixed": "Valor fixo não pode ser negativo."}
+            )
+        return attrs
 
 
 class ServiceSerializer(serializers.ModelSerializer):

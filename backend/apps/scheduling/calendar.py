@@ -66,6 +66,30 @@ class CalendarAdapter(ABC):
         """Lista blocos de horário ocupado no intervalo [start, end)."""
 
 
+def get_calendar_adapter() -> CalendarAdapter:
+    """Resolve o adapter a partir do IntegrationConfig do tenant (Etapa 5).
+
+    Procura `IntegrationConfig(active=True, provider=google_calendar)` no
+    schema atual; qualquer falha (app ainda sem migrate, sem config) cai
+    para Noop sem quebrar `sync_to_calendar`.
+    """
+    try:
+        from apps.settings.models import IntegrationConfig
+
+        cfg = (
+            IntegrationConfig.objects.filter(
+                active=True, provider=IntegrationConfig.Provider.GOOGLE_CALENDAR
+            )
+            .order_by("-updated_at")
+            .first()
+        )
+        if cfg is not None:
+            return GoogleCalendarAdapter(config_override=cfg.config or None)
+    except Exception:
+        logger.info("calendar_adapter_fallback_noop")
+    return NoopCalendarAdapter()
+
+
 class NoopCalendarAdapter(CalendarAdapter):
     """Adapter padrão: apenas loga, não sincroniza com nada."""
 
@@ -93,7 +117,10 @@ class GoogleCalendarAdapter(CalendarAdapter):
     o evento já existe, faz update em vez de criar outro.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, config_override: dict | None = None) -> None:
+        if config_override is not None:
+            self._credentials = config_override
+            return
         creds_json = os.environ.get("GOOGLE_CALENDAR_CREDENTIALS", "")
         if not creds_json:
             logger.warning("google_calendar_credentials_missing")
