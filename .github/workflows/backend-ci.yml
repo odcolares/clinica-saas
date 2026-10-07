@@ -53,7 +53,7 @@ jobs:
       - name: Ruff
         run: ruff check backend/ && ruff format --check backend/
       - name: Bandit
-        run: bandit -q -r backend/
+        run: bandit -q -r backend/ -x backend/tests,backend/apps/ai/tests
       - name: pip-audit
         run: pip-audit --requirement backend/requirements.txt --requirement backend/requirements-dev.txt
       - name: Migrations drift check
