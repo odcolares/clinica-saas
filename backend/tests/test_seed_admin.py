@@ -43,6 +43,7 @@ def test_seed_admin_cria_admin_em_tenant_via_signup():
         stderr=StringIO(),
     )
     _set_public()
+    connection.set_schema("seed_admin_a")
     admin = User.objects.get(username="admin")
     assert admin.email == "admin@clinica.com"
     assert admin.role.name == "admin"
