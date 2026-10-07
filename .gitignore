@@ -60,7 +60,7 @@ media/
 *.tfstate
 *.tfstate.backup
 
-# OpenCode tools
+# AI Tools
 .omc/
 .omo/
 graphify-out/
@@ -69,3 +69,6 @@ graphify-out/
 
 # Kilo tools
 .kilo/
+
+# mcp
+.playwright-mcp/

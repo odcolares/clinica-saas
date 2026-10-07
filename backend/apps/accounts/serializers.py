@@ -22,11 +22,20 @@ class TenantTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=150)
+    username = serializers.CharField(max_length=150, required=False)
+    email = serializers.EmailField(required=False)
     password = serializers.CharField(max_length=128, write_only=True)
 
     def validate(self, attrs):
-        user = authenticate(username=attrs["username"], password=attrs["password"])
+        username = attrs.get("username")
+        if not username and attrs.get("email"):
+            try:
+                username = User.objects.get(email__iexact=attrs["email"]).get_username()
+            except User.DoesNotExist:
+                raise serializers.ValidationError("Credenciais inválidas.")
+        if not username:
+            raise serializers.ValidationError("Informe username ou email.")
+        user = authenticate(username=username, password=attrs["password"])
         if user is None:
             raise serializers.ValidationError("Credenciais inválidas.")
         if getattr(user, "status", "active") != "active" or not user.is_active:

@@ -40,9 +40,7 @@ def validate_business_hours(start: datetime, end: datetime) -> None:
 
     day = local_start.date()
     if local_end.date() != day:
-        raise ValidationError(
-            {"end": "O agendamento não pode cruzar a virada do dia."}
-        )
+        raise ValidationError({"end": "O agendamento não pode cruzar a virada do dia."})
 
     open_at = datetime.combine(day, BUSINESS_START, tzinfo=TIMEZONE)
     close_at = datetime.combine(day, BUSINESS_END, tzinfo=TIMEZONE)
@@ -325,7 +323,9 @@ def complete_appointment(appointment: Appointment) -> Appointment:
     if appointment.status == Appointment.Status.COMPLETED:
         return appointment
     if appointment.status == Appointment.Status.CANCELLED:
-        raise ValidationError({"status": "Agendamento cancelado não pode ser concluído."})
+        raise ValidationError(
+            {"status": "Agendamento cancelado não pode ser concluído."}
+        )
     if appointment.status == Appointment.Status.NO_SHOW:
         return appointment
     appointment.status = Appointment.Status.COMPLETED
@@ -339,7 +339,9 @@ def no_show_appointment(appointment: Appointment) -> Appointment:
     if appointment.status == Appointment.Status.NO_SHOW:
         return appointment
     if appointment.status == Appointment.Status.CANCELLED:
-        raise ValidationError({"status": "Agendamento cancelado não pode ser marcado como no-show."})
+        raise ValidationError(
+            {"status": "Agendamento cancelado não pode ser marcado como no-show."}
+        )
     if appointment.status == Appointment.Status.COMPLETED:
         return appointment
     appointment.status = Appointment.Status.NO_SHOW
@@ -356,9 +358,7 @@ def reschedule_appointment(
 ) -> Appointment:
     """Reagenda um agendamento revalidando conflitos."""
     if end is None:
-        end = start + timedelta(
-            minutes=appointment.service.duration_minutes
-        )
+        end = start + timedelta(minutes=appointment.service.duration_minutes)
 
     duration = (end - start).total_seconds() / 60
     if duration < MIN_APPOINTMENT_MINUTES:
@@ -389,7 +389,10 @@ def reschedule_appointment(
 
 def confirm_appointment(appointment: Appointment) -> Appointment:
     """Confirma um agendamento (SCHEDULED → CONFIRMED)."""
-    if appointment.status not in (Appointment.Status.SCHEDULED, Appointment.Status.CONFIRMED):
+    if appointment.status not in (
+        Appointment.Status.SCHEDULED,
+        Appointment.Status.CONFIRMED,
+    ):
         return appointment
     appointment.status = Appointment.Status.CONFIRMED
     appointment.save(update_fields=["status"])

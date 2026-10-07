@@ -4,14 +4,16 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('app_settings', '0001_initial'),
+        ("app_settings", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='tenantsettings',
-            options={'verbose_name': 'configuração do tenant', 'verbose_name_plural': 'configurações do tenant'},
+            name="tenantsettings",
+            options={
+                "verbose_name": "configuração do tenant",
+                "verbose_name_plural": "configurações do tenant",
+            },
         ),
     ]

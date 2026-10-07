@@ -9,10 +9,9 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('crm', '0002_seed_crm'),
-        ('scheduling', '0002_professional_commission'),
+        ("crm", "0002_seed_crm"),
+        ("scheduling", "0002_professional_commission"),
     ]
 
     operations = [
@@ -20,31 +19,67 @@ class Migration(migrations.Migration):
         # exige a extensão btree_gist ANTES de criar a constraint.
         django.contrib.postgres.operations.CreateExtension("btree_gist"),
         migrations.AlterField(
-            model_name='historicalprofessional',
-            name='commission_fixed',
-            field=models.DecimalField(decimal_places=2, default=0, max_digits=10, validators=[django.core.validators.MinValueValidator(0)]),
+            model_name="historicalprofessional",
+            name="commission_fixed",
+            field=models.DecimalField(
+                decimal_places=2,
+                default=0,
+                max_digits=10,
+                validators=[django.core.validators.MinValueValidator(0)],
+            ),
         ),
         migrations.AlterField(
-            model_name='historicalprofessional',
-            name='commission_percent',
-            field=models.DecimalField(decimal_places=2, default=0, max_digits=5, validators=[django.core.validators.MinValueValidator(0)]),
+            model_name="historicalprofessional",
+            name="commission_percent",
+            field=models.DecimalField(
+                decimal_places=2,
+                default=0,
+                max_digits=5,
+                validators=[django.core.validators.MinValueValidator(0)],
+            ),
         ),
         migrations.AlterField(
-            model_name='historicalservice',
-            name='duration_minutes',
-            field=models.PositiveIntegerField(default=30, help_text='Duração mínima em minutos.', validators=[django.core.validators.MinValueValidator(5)]),
+            model_name="historicalservice",
+            name="duration_minutes",
+            field=models.PositiveIntegerField(
+                default=30,
+                help_text="Duração mínima em minutos.",
+                validators=[django.core.validators.MinValueValidator(5)],
+            ),
         ),
         migrations.AlterField(
-            model_name='service',
-            name='duration_minutes',
-            field=models.PositiveIntegerField(default=30, help_text='Duração mínima em minutos.', validators=[django.core.validators.MinValueValidator(5)]),
+            model_name="service",
+            name="duration_minutes",
+            field=models.PositiveIntegerField(
+                default=30,
+                help_text="Duração mínima em minutos.",
+                validators=[django.core.validators.MinValueValidator(5)],
+            ),
         ),
         migrations.AddConstraint(
-            model_name='appointment',
-            constraint=django.contrib.postgres.constraints.ExclusionConstraint(condition=models.Q(('status__in', ('SCHEDULED', 'CONFIRMED'))), expressions=[('professional', '='), (apps.scheduling.models.TsTzRange('start', 'end', django.contrib.postgres.fields.ranges.RangeBoundary()), '&&')], name='exclude_overlapping_appointments'),
+            model_name="appointment",
+            constraint=django.contrib.postgres.constraints.ExclusionConstraint(
+                condition=models.Q(("status__in", ("SCHEDULED", "CONFIRMED"))),
+                expressions=[
+                    ("professional", "="),
+                    (
+                        apps.scheduling.models.TsTzRange(
+                            "start",
+                            "end",
+                            django.contrib.postgres.fields.ranges.RangeBoundary(),
+                        ),
+                        "&&",
+                    ),
+                ],
+                name="exclude_overlapping_appointments",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='service',
-            constraint=models.CheckConstraint(condition=models.Q(('duration_minutes__gte', 5)), name='service_duration_min_5', violation_error_message='A duração mínima do serviço é de 5 minutos.'),
+            model_name="service",
+            constraint=models.CheckConstraint(
+                condition=models.Q(("duration_minutes__gte", 5)),
+                name="service_duration_min_5",
+                violation_error_message="A duração mínima do serviço é de 5 minutos.",
+            ),
         ),
     ]

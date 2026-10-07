@@ -5,7 +5,6 @@ from __future__ import annotations
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 from rest_framework import serializers
 
 from apps.crm.models import Customer
@@ -44,10 +43,18 @@ class ProfessionalSerializer(serializers.ModelSerializer):
         return obj.specialty_list
 
     def validate(self, attrs):
-        ctype = attrs.get("commission_type", getattr(self.instance, "commission_type", "none"))
-        percent = attrs.get("commission_percent", getattr(self.instance, "commission_percent", 0))
-        fixed = attrs.get("commission_fixed", getattr(self.instance, "commission_fixed", 0))
-        if ctype == "percent" and (percent is None or float(percent) < 0 or float(percent) > 100):
+        ctype = attrs.get(
+            "commission_type", getattr(self.instance, "commission_type", "none")
+        )
+        percent = attrs.get(
+            "commission_percent", getattr(self.instance, "commission_percent", 0)
+        )
+        fixed = attrs.get(
+            "commission_fixed", getattr(self.instance, "commission_fixed", 0)
+        )
+        if ctype == "percent" and (
+            percent is None or float(percent) < 0 or float(percent) > 100
+        ):
             raise serializers.ValidationError(
                 {"commission_percent": "Percentual deve estar entre 0 e 100."}
             )
@@ -168,9 +175,7 @@ class AppointmentWriteSerializer(serializers.ModelSerializer):
     service = serializers.PrimaryKeyRelatedField(
         queryset=Service.objects.filter(active=True)
     )
-    customer = serializers.PrimaryKeyRelatedField(
-        queryset=Customer.objects.all()
-    )
+    customer = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all())
     start = serializers.DateTimeField()
     end = serializers.DateTimeField(required=False, allow_null=True)
 
@@ -190,7 +195,9 @@ class AppointmentWriteSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         start = attrs.get("start")
         end = attrs.get("end")
-        service = attrs.get("service") or self.instance.service if self.instance else None
+        service = (
+            attrs.get("service") or self.instance.service if self.instance else None
+        )
 
         if start and end:
             if end <= start:

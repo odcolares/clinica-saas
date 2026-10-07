@@ -42,10 +42,7 @@ def embedding_stub(text: str) -> list[float]:
     digest = 0
     for char in (text or "").strip().lower():
         digest = (digest * 131 + ord(char)) % (2**32)
-    return [
-        ((digest >> (idx * 4)) & 0xF) / 15.0
-        for idx in range(EMBEDDING_DIM)
-    ]
+    return [((digest >> (idx * 4)) & 0xF) / 15.0 for idx in range(EMBEDDING_DIM)]
 
 
 def search_faq(question: str, *, limit: int = MAX_SNIPPETS) -> list[dict[str, Any]]:
@@ -56,11 +53,7 @@ def search_faq(question: str, *, limit: int = MAX_SNIPPETS) -> list[dict[str, An
     verdade do FAQ operacional). Tenant isolation: o schema ativo do
     django-tenants já restringe as linhas — nenhum dado cross-tenant.
     """
-    terms = [
-        term
-        for term in (question or "").lower().split()
-        if len(term) >= 3
-    ]
+    terms = [term for term in (question or "").lower().split() if len(term) >= 3]
     if not terms:
         return []
 

@@ -10,7 +10,12 @@ from rest_framework.views import APIView
 from apps.crm.permissions import grant_member_perms, visible_queryset
 from apps.crm.views import CrmBaseViewSet
 from rest_framework.throttling import ScopedRateThrottle
-from apps.settings.models import ApiKey, IntegrationConfig, TenantSettings, WebhookEndpoint
+from apps.settings.models import (
+    ApiKey,
+    IntegrationConfig,
+    TenantSettings,
+    WebhookEndpoint,
+)
 from apps.settings.serializers import (
     ApiKeySerializer,
     IntegrationConfigSerializer,
@@ -52,7 +57,9 @@ class IntegrationConfigViewSet(
     ordering_fields = ("provider", "created_at")
 
     def get_queryset(self):
-        return visible_queryset(self.request.user, IntegrationConfig, IntegrationConfig.objects.all())
+        return visible_queryset(
+            self.request.user, IntegrationConfig, IntegrationConfig.objects.all()
+        )
 
     def get_serializer_class(self):
         return IntegrationConfigSerializer
@@ -76,7 +83,9 @@ class WebhookEndpointViewSet(
     ordering_fields = ("name", "created_at")
 
     def get_queryset(self):
-        return visible_queryset(self.request.user, WebhookEndpoint, WebhookEndpoint.objects.all())
+        return visible_queryset(
+            self.request.user, WebhookEndpoint, WebhookEndpoint.objects.all()
+        )
 
     def get_serializer_class(self):
         if self.action in ("create", "update", "partial_update"):
@@ -109,7 +118,9 @@ class ApiKeyViewSet(
     def create(self, request, *args, **kwargs):
         name = (request.data.get("name") or "").strip()
         if not name:
-            return Response({"detail": {"name": "Obrigatório."}}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": {"name": "Obrigatório."}}, status=status.HTTP_400_BAD_REQUEST
+            )
         obj, plain = ApiKey.issue(name=name)
         grant_member_perms(request.user, obj)
         logger.info("api_key_issued", key_id=obj.pk, prefix=obj.prefix)

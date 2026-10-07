@@ -12,7 +12,6 @@ import hashlib
 import secrets
 
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
@@ -36,11 +35,19 @@ class TenantSettings(TimeStampedModel):
         verbose_name_plural = "configurações do tenant"
 
     def __str__(self) -> str:
-        return f"TenantSettings({self.timezone} {self.business_start}-{self.business_end})"
+        return (
+            f"TenantSettings({self.timezone} {self.business_start}-{self.business_end})"
+        )
 
     def clean(self) -> None:
-        if self.business_start and self.business_end and self.business_end <= self.business_start:
-            raise ValidationError({"business_end": "Encerramento deve ser após a abertura."})
+        if (
+            self.business_start
+            and self.business_end
+            and self.business_end <= self.business_start
+        ):
+            raise ValidationError(
+                {"business_end": "Encerramento deve ser após a abertura."}
+            )
 
     @classmethod
     def current(cls) -> TenantSettings:
@@ -58,7 +65,9 @@ class IntegrationConfig(TimeStampedModel):
         NOOP = "noop", "Nenhuma"
         GOOGLE_CALENDAR = "google_calendar", "Google Calendar"
 
-    provider = models.CharField(max_length=32, choices=Provider.choices, default=Provider.NOOP)
+    provider = models.CharField(
+        max_length=32, choices=Provider.choices, default=Provider.NOOP
+    )
     active = models.BooleanField(default=True)
     professional_email = models.EmailField(blank=True, default="")
     config = models.JSONField(default=dict, blank=True)

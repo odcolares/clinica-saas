@@ -83,7 +83,10 @@ def extract_client_data(text: str) -> dict[str, Any]:
             messages=messages,
             temperature=0.0,
             tools=TOOLS,
-            tool_choice={"type": "function", "function": {"name": "extract_client_data"}},
+            tool_choice={
+                "type": "function",
+                "function": {"name": "extract_client_data"},
+            },
         )
 
     def _extract(response: Any) -> str:
