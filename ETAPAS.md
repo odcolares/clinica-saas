@@ -178,13 +178,13 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 
 ### Marcos — Backend API
 
-- [ ] CRUD de Profissionais
-- [ ] Comissões e percentuais
-- [ ] Configurações do tenant (horários, branding)
-- [ ] Integrações externas (Google Calendar adapter)
-- [ ] Webhooks configuráveis
-- [ ] API keys management
-- [ ] Rate limiting por plano
+- [X] CRUD de Profissionais
+- [X] Comissões e percentuais
+- [X] Configurações do tenant (horários, branding)
+- [X] Integrações externas (Google Calendar adapter)
+- [X] Webhooks configuráveis
+- [X] API keys management
+- [X] Rate limiting por plano
 
 ### Odair — Frontend
 
