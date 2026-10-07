@@ -18,7 +18,7 @@
 | **Pagamentos (assinatura SaaS)** | Mercado Pago | $0 mensal | ~3.99% por transação, recorrência nativa |
 | **E-mail** | SendGrid (free tier) / Gmail SMTP | $0 | Até 100 e-mails/dia grátis |
 | **Storage** | Cloudflare R2 | $0 | 10GB grátis, sem egress fee |
-| **Deploy** | Railway.app (free tier) | $0 | 500 horas/mês |
+| **Deploy** | Render.com (free tier, 500 hrs/mo) | $0 | 500 horas/mês inclui PostgreSQL 256MB + Redis 25MB |
 | **CI/CD** | GitHub Actions | $0 | 2000 min/mês para repos privados |
 | **Secrets** | Variáveis de ambiente (.env) | $0 | Migrar para AWS Secrets Manager em produção |
 | **Observabilidade** | structlog + Sentry (free tier) | $0 | Logs JSON + captura de erros |
@@ -61,9 +61,9 @@ A stack definitiva deve ser registrada aqui antes da implementação concreta, m
 ## Custos estimados (MVP)
 
 ```
-Hospedagem Backend (Railway):       $0
-Hospedagem Frontend (Vercel):       $0
-PostgreSQL (Railway):               $0
+Hospedagem Backend (Render.com):        $0
+Hospedagem Frontend (Vercel):          $0
+PostgreSQL (Render):                  $0
 Redis (Railway):                    $0
 Telegram Bot:                       $0
 WhatsApp (Twilio - 100 msg):       ~$0.50
