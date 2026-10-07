@@ -6,8 +6,10 @@
 // ─── Enums ───────────────────────────────────────────────
 
 export type LeadStatus = "NEW" | "CONTACTED" | "QUALIFIED" | "CONVERTED" | "LOST"
-export type AppointmentStatus = "scheduled" | "confirmed" | "cancelled" | "completed"
+export type AppointmentStatus = "schduled" | "confirmed" | "cancelled" | "completed" | "no_show"
 export type InteractionType = "call" | "email" | "visit" | "note"
+export type CommissionType = "none" | "percent" | "fixed"
+export type IntegrationProvider = "noop" | "google_calendar"
 
 // ─── Auth ────────────────────────────────────────────────
 
@@ -167,10 +169,16 @@ export interface Professional {
   id: string
   name: string
   email: string | null
-  specialty: string
-  phone?: string | null
+  phone: string | null
+  specialties: string  // comma-separated list, as stored in backend
+  specialty_list: string[]  // computed from specialties.split(",")
   active: boolean
+  commission_type: CommissionType
+  commission_percent: number  // decimal, 0-100
+  commission_fixed: number    // decimal value
+  user?: string | null  // FK to user
   created_at: string
+  updated_at: string
 }
 
 export interface Service {
@@ -339,4 +347,111 @@ export interface Template {
   body: string
   active: boolean
   created_at: string
+}
+
+// ─── Settings (Etapa 5) ────────────────────────────────
+
+export interface TenantSettings {
+  id: string
+  business_start: string  // time string "08:00"
+  business_end: string    // time string "18:00"
+  timezone: string        // e.g. "America/Sao_Paulo"
+  logo_url: string
+  primary_color: string   // hex color, e.g. "#0F766E"
+  brand_name: string
+  created_at: string
+  updated_at: string
+}
+
+export interface TenantSettingsUpdateRequest {
+  business_start?: string
+  business_end?: string
+  timezone?: string
+  logo_url?: string
+  primary_color?: string
+  brand_name?: string
+}
+
+export interface IntegrationConfig {
+  id: string
+  provider: IntegrationProvider
+  active: boolean
+  professional_email: string
+  config: Record<string, unknown>  // write-only on backend, won't be returned
+  created_at: string
+  updated_at: string
+}
+
+export interface IntegrationConfigCreateRequest {
+  provider: IntegrationProvider
+  professional_email?: string
+  config: Record<string, unknown>
+}
+
+export interface WebhookEndpoint {
+  id: string
+  name: string
+  url: string
+  events: string[]
+  active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface WebhookEndpointCreateRequest {
+  name: string
+  url: string
+  events?: string[]
+  secret?: string
+  active?: boolean
+}
+
+export interface ApiKey {
+  id: string
+  name: string
+  prefix: string
+  active: boolean
+  last_used_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ApiKeyCreateResponse extends ApiKey {
+  plain_key: string  // returned only once on creation
+}
+
+// ─── Scheduling (Etapa 5 - Professional Dashboard) ───────
+
+export interface ProfessionalDashboardStats {
+  professional_id: string
+  professional_name: string
+  total_appointments: number
+  completed_appointments: number
+  scheduled_appointments: number
+  cancelled_appointments: number
+  today_appointments: number
+  upcoming_appointments: Appointment[]
+  recent_commissions?: CommissionEntry[]
+}
+
+export interface CommissionEntry {
+  appointment_id: string
+  service_name: string
+  commission_amount: number
+  status: AppointmentStatus
+  date: string
+}
+
+// ─── Notification Settings (Etapa 5) ─────────────────────
+
+export interface NotificationSettings {
+  appointment_confirmation: boolean
+  appointment_reminder: boolean
+  appointment_reminder_time: number  // minutes before appointment
+  appointment_cancellation: boolean
+  new_lead_alert: boolean
+  payment_received: boolean
+  email_notifications: boolean
+  sms_notifications: boolean
+  push_notifications: boolean
 }

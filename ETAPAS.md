@@ -188,11 +188,11 @@ Definir as etapas de desenvolvimento do Clinica SaaS focadas exclusivamente em i
 
 ### Odair — Frontend
 
-- [ ] Gestão de profissionais (CRUD + agenda)
-- [ ] Configurações do tenant (logo, cores, horários)
-- [ ] Painel de integrações
-- [ ] Dashboard de profissionais
-- [ ] Configurações de notificação
+- [x] Gestão de profissionais (CRUD + agenda)
+- [x] Configurações do tenant (logo, cores, horários)
+- [x] Painel de integrações
+- [x] Dashboard de profissionais
+- [x] Configurações de notificação
 
 ---
 
@@ -285,4 +285,4 @@ Etapa 5 (Configurações) ◄─────────────────
 > **Responsáveis:** Marcos (Backend/DB) + Odair (Frontend/UI)
 > **Atualização:** 2026-09-20 — Etapa 2 Frontend (Agenda) concluída: calendário FullCalendar, formulário agendamento, disponibilidade profissionais, confirmação/cancelamento, responsividade mobile
 > **Atualização:** 2026-09-30 — Etapa 3 Frontend (Omnichannel) concluída: interface de atendimento ao vivo (conversation-chat), lista de conversas (conversation-list), polling 8s, templates offline via localStorage, badge de status do agente, painel de gestão de canais. 10 testes vitest passando.
-> **Atualização:** 2026-10-01 — Etapa 4 Frontend (AI Assistant) concluída: badge "IA respondeu" nas mensagens, botão "Melhore esta resposta", painel de configuração de IA, histórico de interações da IA, ajustes de prompt (UI amigável). PR #8 mergeada para master.
+> **Atualização:** 2026-10-07 — Etapa 5 Frontend concluída: Gestão de profissionais (CRUD completo com comissões), Configurações do tenant (horários de funcionamento, branding), Painel de integrações (Google Calendar, webhooks, API keys), Dashboard de profissionais (comissões e agendamentos), Configurações de notificação. 71 testes vitest passando.

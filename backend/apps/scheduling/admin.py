@@ -5,9 +5,9 @@ from .models import Appointment, Professional, Service
 
 @admin.register(Professional)
 class ProfessionalAdmin(admin.ModelAdmin):
-    list_display = ("name", "email", "active", "user")
+    list_display = ("name", "email", "active", "commission_type", "user")
     search_fields = ("name", "email", "specialties")
-    list_filter = ("active",)
+    list_filter = ("active", "commission_type")
 
 
 @admin.register(Service)

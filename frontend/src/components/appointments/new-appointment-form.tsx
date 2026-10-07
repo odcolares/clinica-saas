@@ -89,7 +89,7 @@ export function NewAppointmentForm({ onSuccess }: NewAppointmentFormProps) {
               <SelectContent>
                 {professionals.map((p) => (
                   <SelectItem key={p.id} value={p.id}>
-                    {p.name} - {p.specialty}
+                    {p.name} - {p.specialty_list?.join(", ") || "Sem especialidade"}
                   </SelectItem>
                 ))}
               </SelectContent>

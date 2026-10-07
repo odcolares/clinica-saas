@@ -6,16 +6,18 @@ Domínio responsável pelo agendamento de serviços, controle de disponibilidade
 ## 2. Entidades Principais
 
 ### Professional
-- `id`, `name`, `email`, `specialty`, `phone`, `active`, `created_at`
-- Relacionamento: 1:N com Appointment, 1:N com ProfessionalAvailability
+- `id`, `name`, `email`, `phone`, `specialties` (comma-separated), `active`, `created_at`, `updated_at`
+- Comissões: `commission_type` (none | percent | fixed), `commission_percent` (0-100), `commission_fixed` (decimal)
+- `user` — FK opcional para Auth User
+- Relacionamento: 1:N com Appointment
 
 ### Service
 - `id`, `name`, `duration_minutes`, `price`, `description`
 - Relacionamento: 1:N com Appointment
 
 ### Appointment
-- `id`, `customer`, `professional`, `service`, `start_time`, `end_time`, `status`, `notes`, `created_at`, `updated_at`
-- Status: `scheduled` | `confirmed` | `cancelled` | `completed`
+- `id`, `customer`, `professional`, `service`, `start`, `end`, `status`, `notes`, `confirmation_token`, `external_event_id`, `created_at`, `updated_at`
+- Status: `SCHEDULED` | `CONFIRMED` | `CANCELLED` | `COMPLETED` | `NO_SHOW`
 - Relacionamento: N:1 com Customer, Professional, Service
 
 ### ProfessionalAvailability

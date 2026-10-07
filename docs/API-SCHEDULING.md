@@ -7,9 +7,15 @@ Exceção: webhook de confirmação (token na URL lógica, `x-tenant-id` como hi
 
 | Método | Path | Body | Respostas |
 |---|---|---|---|
-| POST | `/professionals/` | `{name, email?, phone?, specialties?, active?, user?}` | 201 / 400 |
+| POST | `/professionals/` | `{name, email?, phone?, specialties?, commission_type?, commission_percent?, commission_fixed?, active?, user?}` | 201 / 400 |
 | GET | `/professionals/` | filtros `?active=&search=&ordering=` | 200 paginado |
 | GET/PATCH/DELETE | `/professionals/{id}/` | — | 200 / 404 |
+
+**Comissões:**
+- `commission_type`: `none` | `percent` | `fixed` (default: `none`)
+- `commission_percent`: decimal 0-100 (quando `percent`)
+- `commission_fixed`: decimal >= 0 (quando `fixed`)
+- Validação: percentual entre 0-100, valor fixo não negativo
 
 ## Serviços
 

@@ -5,15 +5,17 @@ import type {
   Professional,
   Service,
   Appointment,
-  AppointmentCreateRequest,
   Quote,
   Payment,
   CashTransaction,
-  LeadStatus,
-  AppointmentStatus,
   Conversation,
   ConversationMessage,
   Template,
+  TenantSettings,
+  IntegrationConfig,
+  WebhookEndpoint,
+  ApiKey,
+  NotificationSettings,
 } from "@/types/api"
 
 // ─── Leads ───────────────────────────────────────────────
@@ -133,28 +135,43 @@ export const professionals: Professional[] = [
     id: "prof-001",
     name: "Dra. Mariana Costa",
     email: "mariana@clinica.com",
-    specialty: "Odontologia",
     phone: "(11) 91111-2222",
+    specialties: "Odontologia",
+    specialty_list: ["Odontologia"],
     active: true,
+    commission_type: "percent",
+    commission_percent: 15,
+    commission_fixed: 0,
     created_at: "2025-01-01T00:00:00Z",
+    updated_at: "2025-01-01T00:00:00Z",
   },
   {
     id: "prof-002",
     name: "Dr. Roberto Alves",
     email: "roberto@clinica.com",
-    specialty: "Ortodontia",
     phone: "(11) 93333-4444",
+    specialties: "Ortodontia",
+    specialty_list: ["Ortodontia"],
     active: true,
+    commission_type: "fixed",
+    commission_percent: 0,
+    commission_fixed: 100,
     created_at: "2025-01-01T00:00:00Z",
+    updated_at: "2025-01-01T00:00:00Z",
   },
   {
     id: "prof-003",
     name: "Dra. Camila Ferreira",
     email: "camila@clinica.com",
-    specialty: "Estética Dental",
     phone: "(11) 95555-6666",
+    specialties: "Estética Dental",
+    specialty_list: ["Estética Dental"],
     active: true,
+    commission_type: "none",
+    commission_percent: 0,
+    commission_fixed: 0,
     created_at: "2025-01-01T00:00:00Z",
+    updated_at: "2025-01-01T00:00:00Z",
   },
 ]
 
@@ -564,4 +581,46 @@ export function paginate<T>(items: T[], page: number, pageSize: number) {
     previous: page > 1 ? `?page=${page - 1}` : null,
     results: items.slice(start, end),
   }
+}
+
+// ─── Settings (Etapa 5) ────────────────────────────────────
+
+export const tenantSettings: TenantSettings = {
+  id: "tenant-001",
+  business_start: "08:00",
+  business_end: "18:00",
+  timezone: "America/Sao_Paulo",
+  logo_url: "",
+  primary_color: "#0F766E",
+  brand_name: "Clínica Saúde",
+  created_at: "2025-01-01T00:00:00Z",
+  updated_at: "2025-01-01T00:00:00Z",
+}
+
+export const integrationConfigs: IntegrationConfig[] = [
+  {
+    id: "int-001",
+    provider: "google_calendar",
+    active: true,
+    professional_email: "mariana@clinica.com",
+    config: {},
+    created_at: "2025-09-15T10:00:00Z",
+    updated_at: "2025-09-15T10:00:00Z",
+  },
+]
+
+export const webhookEndpoints: WebhookEndpoint[] = []
+
+export const apiKeys: ApiKey[] = []
+
+export const notificationSettings: NotificationSettings = {
+  appointment_confirmation: true,
+  appointment_reminder: true,
+  appointment_reminder_time: 24,
+  appointment_cancellation: true,
+  new_lead_alert: true,
+  payment_received: true,
+  email_notifications: true,
+  sms_notifications: false,
+  push_notifications: false,
 }

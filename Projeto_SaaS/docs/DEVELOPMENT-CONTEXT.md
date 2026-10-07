@@ -44,6 +44,9 @@ Separar claramente administração global de administração do tenant. Acesso a
 ## 12. Subscriptions
 Features e limites devem ser verificados por entitlements. Evitar espalhar regras de plano por dezenas de endpoints; centralizar política de acesso a capacidades.
 
+## 12.1. Settings
+Configurações do tenant (horários, branding, integrações, webhooks, API keys) operam no schema do tenant. Segredos nunca no código. API keys usam hash SHA256; o plain_key é retornado uma única vez. Rate limiting por plano via PlanRateThrottle.
+
 ## 13. API
 Contratos devem ser explícitos, versionáveis e consistentes. Erros devem possuir formato previsível. Validação de entrada é obrigatória. Paginação, filtros e ordenação devem ter comportamento documentado.
 
