@@ -66,3 +66,6 @@ media/
 graphify-out/
 .maestri/
 .commandcode/
+
+# Kilo tools
+.kilo/
