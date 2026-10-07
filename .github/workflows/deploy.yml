@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Railway CLI
         run: |
@@ -19,7 +19,7 @@ jobs:
           echo "$HOME/.railway/bin" >> "$GITHUB_PATH"
 
       - name: Deploy backend to Railway
-        working-directory: backend
-        run: railway up --detach --service clinicasaas-backend
+        run: railway up --service clinicasaas-backend
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT: ${{ secrets.RAILWAY_PROJECT_ID }}
