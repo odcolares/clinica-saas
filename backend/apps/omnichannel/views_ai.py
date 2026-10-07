@@ -118,9 +118,7 @@ class SummarizeView(AIBaseView):
         )
         messages = list(conversation.messages.all())
         if not messages:
-            raise ValidationError(
-                {"conversation_id": "Conversa sem mensagens."}
-            )
+            raise ValidationError({"conversation_id": "Conversa sem mensagens."})
         return Response({"summary": summarize_conversation(messages)})
 
 

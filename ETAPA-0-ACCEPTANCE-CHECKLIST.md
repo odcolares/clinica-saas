@@ -18,7 +18,7 @@
   - Gate: histórico reescrito ou repo recriado sem ordem do CTO → ❌ CRÍTICO.
 - [ ] **F-00.2** Pastas `backend/`, `frontend/`, `docs/` criadas **preservando** `Projeto_SaaS/` intacto.
   - Gate: qualquer arquivo de `Projeto_SaaS/` movido/apagado sem decisão registrada → ❌ ALTO.
-- [ ] **F-00.3** `.gitignore` cobre `backend/.env*`, `*.sqlite3` acidental, volumes Docker, `staticfiles/`, `media/`.
+- [ ] **F-00.3** `.gitignore` cobre `backend/.env*`, `*.sqlite3` acidental, `staticfiles/`, `media/`.
   - Risco conhecido: `.gitignore` raiz ignora `package-lock.json`/`yarn.lock`/`pnpm-lock.yaml` — antipadrão de reprodutibilidade para o frontend Next.js (decidir antes da Etapa 0 fechar; recomendar versionar lockfile).
 
 ## 1. Django 5 + DRF (item 3)
@@ -38,7 +38,7 @@
   - Evidência: teste automatizado chamando endpoint autenticado sem header/subdomain → 401/403.
 - [ ] **F-02.4** Teste de isolamento com **2 tenants reais**: dado criado via API no tenant A é invisível/inacessível (404/403) no tenant B, inclusive por enumeração de ID.
   - Gate: ausência desse teste → ❌ CRÍTICO (é o requisito estrutural do produto).
-- [ ] **F-02.5** Deploy/migrations usam `migrate_schemas` (não `migrate` puro); documentado no Docker/CI.
+- [ ] **F-02.5** Deploy/migrations usam `migrate_schemas` (não `migrate` puro); documentado no README/CI.
   - Gate: CI roda `migrate` comum → schemas de tenant ficam sem migration → ❌ ALTO.
 - [ ] **F-02.6** Django Admin não expõe travessia entre tenants (se admin habilitado em dev, justificar).
 
@@ -80,7 +80,7 @@
 - [ ] **F-07.1** `SECRET_KEY`, `DATABASE_URL`, senha Redis/Postgres, Sentry DSN, chaves externas: **somente** via env; `settings.py` usa `env(...)` sem default real.
   - Gate: qualquer segredo literal commitado → ❌ CRÍTICO (e exige rotação + limpeza de histórico documentada).
 - [ ] **F-07.2** `.env.example` completo (todas as vars, valores dummy) e versionado; `.env` ignorado.
-- [ ] **F-07.3** `docker-compose.yml` sem credenciais hardcoded (usa `env_file`/`${VAR}`); senhas dev dummy aceitas **apenas** para serviços locais e identificadas como tal.
+- [ ] **F-07.3** Nenhuma credencial hardcoded nos arquivos de ambiente local; senhas dev dummy aceitas **apenas** para serviços locais e identificadas como tal.
 - [ ] **F-07.4** CI usa GitHub Secrets; nenhum segredo impresso em log de pipeline.
 - [ ] **F-07.5** Verificação pós-entrega: `git log -p`/grep por `SECRET_KEY=`, `postgres://`, DSN Sentry no histórico dos commits novos.
 
@@ -98,11 +98,11 @@
   - Gate: log de request com headers/body crus → ❌ ALTO.
 - [ ] **F-09.3** Sentry inicializado só com DSN presente (dev sem DSN não quebra boot); `environment`/`release` tags definidas.
 
-## 10. Docker local (item 8)
+## 10. Ambiente local (item 8)
 
-- [ ] **F-10.1** `docker-compose`: PostgreSQL **16** + Redis, imagens com versão pinada, healthchecks, volumes nomeados (não commitados).
+- [ ] **F-10.1** PostgreSQL **16** + Redis locais, sem containers: Postgres local com role/database documentados, Redis via WSL na porta padrão.
 - [ ] **F-10.2** Usuário Postgres com privilégio de criação de schema (exigência django-tenants) — documentado; sem `superuser` hardcoded como default de produção.
-- [ ] **F-10.3** Bootstrap reprodutível: README/comentário no compose com `docker compose up` + `migrate_schemas` + `createsuperuser`; subir do zero funciona (evidência: saída real).
+- [ ] **F-10.3** Bootstrap reprodutível: `subir-aplicacao.bat` + `migrate_schemas` + `createsuperuser`; subir do zero funciona (evidência: saída real).
 - [ ] **F-10.4** Portas padrão não conflitam com serviços existentes; Postgres/Redis **não** expostos publicamente em produção (INFRASTRUCTURE.md Rede) — em dev local, bind em `127.0.0.1` é preferível.
 
 ## 11. Migrations (DATABASE.md; DEVELOPMENT-CONTEXT §4)

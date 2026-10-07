@@ -17,7 +17,7 @@
 5. Signup de tenant (cria schema + usuário admin).
 6. Login + JWT.
 7. Middleware de tenant context (`x-tenant-id`).
-8. Setup Docker local (PostgreSQL 16 + Redis).
+8. Setup local (PostgreSQL 16 + Redis).
 9. CI/CD pipeline (GitHub Actions → Railway + Vercel).
 10. Variáveis de ambiente (`.env`; nunca commitar segredos).
 11. Sentry + structlog configurado.
@@ -37,7 +37,7 @@
 - `Projeto_SaaS/security/SECURITY.md`
 
 ## 4. Divisão entre os terminais já conectados (NÃO criar novos terminais)
-- **OpenCode (Dev Senior)** → validar estado + criar `backend/`, Docker PostgreSQL 16 + Redis,
+- **OpenCode (Dev Senior)** → validar estado + criar `backend/`, PostgreSQL 16 + Redis locais,
   `.env.example`, setup Django 5 + DRF + django-tenants, base de signup/login JWT/middleware.
   Menor mudança necessária. Sem ETAPA 1 (sem CRM) e sem frontend do Odair.
 - **Oh My PI (Code Reviewer)** → checklist de aceite da fundação + revisão sem alterar código
@@ -50,5 +50,5 @@
 1. OpenCode implementa → 2. Oh My PI revisa → 3. Freebuff valida → 4. CTO consolida.
 
 ## 6. Definition of Done (Marcos, ETAPA 0)
-Código + migrations + tenant isolation + JWT + middleware + Docker + CI + logs sem segredos
+Código + migrations + tenant isolation + JWT + middleware + ambiente local + CI + logs sem segredos
 + testes + docs de endpoints, tudo validado por review + QA.

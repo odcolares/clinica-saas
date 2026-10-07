@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
-from apps.settings.models import ApiKey, IntegrationConfig, TenantSettings, WebhookEndpoint
+from apps.settings.models import (
+    ApiKey,
+    IntegrationConfig,
+    TenantSettings,
+    WebhookEndpoint,
+)
 
 
 class TenantSettingsSerializer(serializers.ModelSerializer):
@@ -57,5 +62,13 @@ class WebhookCreateSerializer(WebhookEndpointSerializer):
 class ApiKeySerializer(serializers.ModelSerializer):
     class Meta:
         model = ApiKey
-        fields = ("id", "name", "prefix", "active", "last_used_at", "created_at", "updated_at")
+        fields = (
+            "id",
+            "name",
+            "prefix",
+            "active",
+            "last_used_at",
+            "created_at",
+            "updated_at",
+        )
         read_only_fields = fields

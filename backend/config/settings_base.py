@@ -110,6 +110,7 @@ TENANT_APPS = [
     "apps.scheduling",
     "apps.omnichannel",
     "apps.ai",
+    "apps.settings",
 ]
 
 # contenttypes aparece em SHARED_APPS e TENANT_APPS (padrão exigido pelo

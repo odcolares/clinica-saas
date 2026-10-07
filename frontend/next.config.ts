@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  /* API proxy vive em src/app/api/v1/[...path]/route.ts */
 };
 
 export default nextConfig;

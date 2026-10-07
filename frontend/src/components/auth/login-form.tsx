@@ -15,6 +15,7 @@ import { Loader2 } from "lucide-react"
 const loginSchema = z.object({
   email: z.string().email("E-mail inválido"),
   password: z.string().min(1, "Senha é obrigatória"),
+  tenant: z.string().min(1, "Tenant é obrigatório"),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
@@ -29,6 +30,7 @@ export function LoginForm() {
     formState: { isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
+    defaultValues: { email: "admin@clinica.local", tenant: "demo" },
   })
 
   const onSubmit = async (data: LoginFormValues) => {
@@ -39,13 +41,14 @@ export function LoginForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-Tenant-Id": data.tenant,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ email: data.email, password: data.password }),
       })
 
       if (!res.ok) {
-        const errorData = await res.json()
-        setError(errorData.detail || "Credenciais inválidas")
+        const errorData = await res.json().catch(() => null)
+        setError(errorData?.detail || "Credenciais inválidas")
         return
       }
 
@@ -69,14 +72,22 @@ export function LoginForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
+            <Label htmlFor="tenant">Clínica (tenant)</Label>
+            <Input
+              id="tenant"
+              placeholder="demo"
+              autoComplete="off"
+              {...register("tenant")}
+            />
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="email">E-mail</Label>
             <Input
               id="email"
               type="email"
-              placeholder="admin@clinica.com"
+              placeholder="admin@clinica.local"
               autoComplete="email"
               {...register("email")}
-              defaultValue="admin@clinica.com"
             />
           </div>
           <div className="space-y-2">
@@ -86,7 +97,6 @@ export function LoginForm() {
               type="password"
               autoComplete="current-password"
               {...register("password")}
-              defaultValue="admin123"
             />
           </div>
           {error && (

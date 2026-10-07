@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("scheduling", "0001_initial"),
     ]
@@ -24,7 +23,11 @@ class Migration(migrations.Migration):
             model_name="historicalprofessional",
             name="commission_type",
             field=models.CharField(
-                choices=[("none", "Sem comissão"), ("percent", "Percentual"), ("fixed", "Valor fixo")],
+                choices=[
+                    ("none", "Sem comissão"),
+                    ("percent", "Percentual"),
+                    ("fixed", "Valor fixo"),
+                ],
                 default="none",
                 max_length=16,
             ),
@@ -32,18 +35,32 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="professional",
             name="commission_fixed",
-            field=models.DecimalField(decimal_places=2, default=0, max_digits=10, validators=[MinValueValidator(0)]),
+            field=models.DecimalField(
+                decimal_places=2,
+                default=0,
+                max_digits=10,
+                validators=[MinValueValidator(0)],
+            ),
         ),
         migrations.AddField(
             model_name="professional",
             name="commission_percent",
-            field=models.DecimalField(decimal_places=2, default=0, max_digits=5, validators=[MinValueValidator(0)]),
+            field=models.DecimalField(
+                decimal_places=2,
+                default=0,
+                max_digits=5,
+                validators=[MinValueValidator(0)],
+            ),
         ),
         migrations.AddField(
             model_name="professional",
             name="commission_type",
             field=models.CharField(
-                choices=[("none", "Sem comissão"), ("percent", "Percentual"), ("fixed", "Valor fixo")],
+                choices=[
+                    ("none", "Sem comissão"),
+                    ("percent", "Percentual"),
+                    ("fixed", "Valor fixo"),
+                ],
                 default="none",
                 max_length=16,
             ),

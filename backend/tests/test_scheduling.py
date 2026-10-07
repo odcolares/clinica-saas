@@ -46,7 +46,11 @@ def _base(slug: str) -> tuple[APIClient, dict]:
 
     prof = client.post(
         "/api/v1/professionals/",
-        {"name": "Dra. Ana", "email": "ana@example.com", "specialties": "Limpeza, Clareamento"},
+        {
+            "name": "Dra. Ana",
+            "email": "ana@example.com",
+            "specialties": "Limpeza, Clareamento",
+        },
         format="json",
     )
     assert prof.status_code == 201, prof.content
@@ -59,7 +63,9 @@ def _base(slug: str) -> tuple[APIClient, dict]:
     assert svc.status_code == 201, svc.content
 
     cust = client.post(
-        "/api/v1/customers/", {"name": "Cliente", "email": "cli@example.com"}, format="json"
+        "/api/v1/customers/",
+        {"name": "Cliente", "email": "cli@example.com"},
+        format="json",
     )
     assert cust.status_code == 201, cust.content
 
@@ -90,7 +96,9 @@ def test_crud_professional_service():
     client, ids = _base("sched-crud")
     assert client.get("/api/v1/professionals/").data["count"] == 1
     assert client.get("/api/v1/services/").data["count"] == 1
-    assert client.get(f"/api/v1/professionals/{ids['professional']}/").status_code == 200
+    assert (
+        client.get(f"/api/v1/professionals/{ids['professional']}/").status_code == 200
+    )
 
 
 def test_criar_appointment_ok_e_token_no_detail():
@@ -123,9 +131,7 @@ def test_profissional_diferente_mesmo_horario_permitido():
     client, ids = _base("sched-diffprof")
     assert _book(client, ids, _start(hour=10)).status_code == 201
 
-    other = client.post(
-        "/api/v1/professionals/", {"name": "Dr. Bia"}, format="json"
-    )
+    other = client.post("/api/v1/professionals/", {"name": "Dr. Bia"}, format="json")
     assert other.status_code == 201, other.content
     resp = _book(client, {**ids, "professional": other.data["id"]}, _start(hour=10))
     assert resp.status_code == 201, resp.content
@@ -212,7 +218,9 @@ def test_isolamento_entre_tenants():
     client_b = APIClient()
     _auth(client_b, _signup(client_b, "sched-iso-b").data["access"])
     assert client_b.get("/api/v1/appointments/").data["results"] == []
-    assert client_b.get(f"/api/v1/appointments/{created.data['id']}/").status_code == 404
+    assert (
+        client_b.get(f"/api/v1/appointments/{created.data['id']}/").status_code == 404
+    )
 
 
 def test_historico_appointment_registrado():

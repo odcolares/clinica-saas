@@ -91,9 +91,7 @@ def _conversation(**kwargs) -> Conversation:
 # --- intent ----------------------------------------------------------------
 
 
-def test_classify_intent_devolve_intencao_e_confianca(
-    tenant, patch_client
-):
+def test_classify_intent_devolve_intencao_e_confianca(tenant, patch_client):
     connection.set_tenant(tenant)
     patch_client(_parse_client("booking", 0.92))
     result = intent.classify_intent("quero agendar uma consulta")
@@ -238,7 +236,9 @@ def test_summarize_conversa_vazia_retorna_vazio(tenant):
 
 def test_summarize_conversa_em_ptbr(tenant, patch_client):
     connection.set_tenant(tenant)
-    patch_client(_chat_client("Cliente quer agendar limpeza. Próximo passo: confirmar horário."))
+    patch_client(
+        _chat_client("Cliente quer agendar limpeza. Próximo passo: confirmar horário.")
+    )
     messages = [
         ConversationMessage(
             direction=ConversationMessage.Direction.INBOUND,
@@ -396,9 +396,7 @@ def test_endpoint_extract_200_com_conversation_id(patch_client):
     patch_client(
         _chat_client(
             "",
-            tool_arguments=(
-                '{"nome":"Maria","telefone":"11988887777","servico":null}'
-            ),
+            tool_arguments=('{"nome":"Maria","telefone":"11988887777","servico":null}'),
         )
     )
     resp = client.post(

@@ -12,7 +12,11 @@ import uuid
 
 from django.conf import settings
 from django.contrib.postgres.constraints import ExclusionConstraint
-from django.contrib.postgres.fields import DateTimeRangeField, RangeBoundary, RangeOperators
+from django.contrib.postgres.fields import (
+    DateTimeRangeField,
+    RangeBoundary,
+    RangeOperators,
+)
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Func, Q
@@ -188,7 +192,10 @@ class Appointment(TimeStampedModel):
                 name="exclude_overlapping_appointments",
                 expressions=[
                     ("professional", RangeOperators.EQUAL),
-                    (TsTzRange("start", "end", RangeBoundary()), RangeOperators.OVERLAPS),
+                    (
+                        TsTzRange("start", "end", RangeBoundary()),
+                        RangeOperators.OVERLAPS,
+                    ),
                 ],
                 condition=Q(status__in=("SCHEDULED", "CONFIRMED")),
             ),
@@ -217,7 +224,5 @@ class Appointment(TimeStampedModel):
         from datetime import timedelta
 
         if self.end is None and self.service_id and self.start:
-            self.end = self.start + timedelta(
-                minutes=self.service.duration_minutes
-            )
+            self.end = self.start + timedelta(minutes=self.service.duration_minutes)
         super().save(*args, **kwargs)

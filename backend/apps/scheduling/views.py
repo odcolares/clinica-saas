@@ -10,8 +10,7 @@ from __future__ import annotations
 from datetime import datetime
 
 import structlog
-from django.shortcuts import get_object_or_404
-from rest_framework import mixins, status, viewsets
+from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -57,7 +56,9 @@ class ProfessionalViewSet(
     ordering_fields = ("name", "created_at")
 
     def get_queryset(self):
-        return visible_queryset(self.request.user, Professional, Professional.objects.all())
+        return visible_queryset(
+            self.request.user, Professional, Professional.objects.all()
+        )
 
     def get_serializer_class(self):
         return ProfessionalSerializer
@@ -113,9 +114,7 @@ class AppointmentViewSet(
     ordering_fields = ("start", "created_at")
 
     def get_queryset(self):
-        base = Appointment.objects.select_related(
-            "professional", "service", "customer"
-        )
+        base = Appointment.objects.select_related("professional", "service", "customer")
         return visible_queryset(self.request.user, Appointment, base)
 
     def get_serializer_class(self):
@@ -204,7 +203,12 @@ class AvailabilityView(APIView):
 
         if not professional_id or not date_str:
             return Response(
-                {"detail": {"professional": "Obrigatório.", "date": "Obrigatório (YYYY-MM-DD)."}},
+                {
+                    "detail": {
+                        "professional": "Obrigatório.",
+                        "date": "Obrigatório (YYYY-MM-DD).",
+                    }
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         try:
@@ -215,14 +219,28 @@ class AvailabilityView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        professional = visible_queryset(request.user, Professional, Professional.objects.filter(pk=professional_id, active=True)).first()
+        professional = visible_queryset(
+            request.user,
+            Professional,
+            Professional.objects.filter(pk=professional_id, active=True),
+        ).first()
         if not professional:
-            return Response({"detail": "Profissional não encontrado ou sem permissão."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"detail": "Profissional não encontrado ou sem permissão."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         service = None
         if service_id:
-            service = visible_queryset(request.user, Service, Service.objects.filter(pk=service_id, active=True)).first()
+            service = visible_queryset(
+                request.user,
+                Service,
+                Service.objects.filter(pk=service_id, active=True),
+            ).first()
             if not service:
-                return Response({"detail": "Serviço não encontrado ou sem permissão."}, status=status.HTTP_404_NOT_FOUND)
+                return Response(
+                    {"detail": "Serviço não encontrado ou sem permissão."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
         slots = get_daily_slots(professional, target_date, service)
         return Response(
