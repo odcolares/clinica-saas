@@ -90,4 +90,6 @@ def test_seed_admin_garante_papeis_default():
         stderr=StringIO(),
     )
     _set_public()
+    connection.set_schema("seed_admin_b")
     assert {r.name for r in Role.objects.all()} >= {"admin", "manager", "attendant"}
+    _set_public()
