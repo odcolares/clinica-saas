@@ -31,7 +31,7 @@ env = environ.Env(
     LLM_CACHE_TTL_SECONDS=(int, 3600),
 )
 
-environ.Env.read_env(BASE_DIR / ".env", overwrite=False)
+environ.Env.read_env(BASE_DIR / ".env", overwrite=False) if (BASE_DIR / ".env").exists() else None
 
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="django-insecure-etapa0-dev-only")
 DEBUG = env("DJANGO_DEBUG")
