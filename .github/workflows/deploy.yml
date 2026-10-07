@@ -15,7 +15,9 @@ jobs:
 
       - name: Install Render CLI
         run: |
-          npm install -g @render-oss/cli
+          curl -sSL https://render-cli.com/install.sh | RENDER_SKIP_DOWNLOAD_VERIFY=1 bash
+          echo "$HOME/.render/bin" >> "$GITHUB_PATH"
+          which render
 
       - name: Deploy backend to Render
         run: render deploy --service "$RENDER_SERVICE_ID"
