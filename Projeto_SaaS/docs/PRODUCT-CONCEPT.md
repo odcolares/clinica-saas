@@ -83,6 +83,9 @@ Classificação, resumo, extração de dados, sugestões e automações controla
 ### SaaS Admin
 Operação global da plataforma, tenants, planos, assinaturas, entitlements e suporte.
 
+### Configurações
+Horários de funcionamento, branding (logo, cores, nome da marca), integrações externas (Google Calendar), webhooks configuráveis e API keys.
+
 ## 12. Orçamento e pagamento
 A aprovação de um orçamento registra intenção comercial aceita. O pagamento é uma responsabilidade financeira independente. Um orçamento aprovado pode gerar um agendamento sem significar que o serviço foi pago.
 

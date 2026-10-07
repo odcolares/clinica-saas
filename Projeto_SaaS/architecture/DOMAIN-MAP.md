@@ -5,10 +5,10 @@ Mapear os domínios do produto, suas responsabilidades, entidades proprietárias
 
 ## 2. Visão geral
 ```text
-                         ┌──────────────────┐
-                         │    SaaS Admin    │
-                         └────────┬─────────┘
-                                  │
+                          ┌──────────────────┐
+                          │    SaaS Admin    │
+                          └────────┬─────────┘
+                                   │
 ┌──────────────┐          ┌───────▼────────┐          ┌──────────────┐
 │ Omnichannel  │─────────▶│      CRM       │◀─────────│     AI       │
 └──────┬───────┘          └───────┬────────┘          └──────────────┘
@@ -18,12 +18,16 @@ Mapear os domínios do produto, suas responsabilidades, entidades proprietárias
        │                    └──────┬───────┘
        │                           │
        │                    ┌──────▼───────┐
-       └───────────────────▶│  Scheduling  │
-                            └──────┬───────┘
-                                   │
-                            ┌──────▼───────┐
-                            │   Finance    │
-                            └──────────────┘
+       └──────────────────▶│  Scheduling  │
+                           └──────┬───────┘
+                                  │
+                           ┌──────▼───────┐
+                           │   Finance    │
+                           └──────┬───────┘
+                                  │
+                           ┌──────▼───────┐
+                           │  Settings    │
+                           └──────────────┘
 
 Auth/RBAC, Security, Audit, Observability, Subscriptions e Integrations atravessam os domínios.
 ```
@@ -58,6 +62,8 @@ Define estado de assinatura, plano, recursos e limites aplicáveis ao tenant. Po
 ## 12. Integrations
 Responsável pelos adapters e contratos com serviços externos: canais, Google Calendar, provedores de pagamento, e-mail e outros.
 
+## 13. Settings
+Responsável pelas configurações do tenant: horários de funcionamento, branding (logo, cores, nome), integrações externas (Google Calendar adapter), webhooks configuráveis e API keys. Opera no schema do tenant; segredos nunca são logados.
 ## 13. Camadas transversais
 - Security
 - Audit

@@ -36,11 +36,22 @@
 - GET /quotes
 
 ## Scheduling
+- POST /professionals
+- GET /professionals
+- GET /professionals/{id}
+- PATCH /professionals/{id}
+- DELETE /professionals/{id}
+- GET /services
+- GET /services/{id}
 - POST /appointments
 - PATCH /appointments/{id}
 - POST /appointments/{id}/cancel
 - POST /appointments/{id}/reschedule
+- POST /appointments/{id}/confirm
+- POST /appointments/{id}/complete
+- POST /appointments/{id}/no-show
 - GET /appointments
+- GET /availability?date=YYYY-MM-DD&professional=ID [&service=ID]
 
 ## Omnichannel
 - GET /conversations — lista conversas (filtros: channel, status, assigned_to, customer, lead)
@@ -64,6 +75,26 @@ Regras do webhook do Telegram:
 - GET /financial/reports
 - POST /reconciliations
 - GET /financial/reconciliation-reports
+
+## Settings (Etapa 5)
+- GET /settings/tenant — retorna/atualiza as configurações do tenant (singleton)
+- PATCH /settings/tenant
+- GET /settings/integrations — lista integrações (Google Calendar, etc.)
+- POST /settings/integrations
+- GET /settings/integrations/{id}
+- PATCH /settings/integrations/{id}
+- DELETE /settings/integrations/{id}
+- GET /settings/webhooks — lista webhooks configuráveis
+- POST /settings/webhooks
+- GET /settings/webhooks/{id}
+- PATCH /settings/webhooks/{id}
+- DELETE /settings/webhooks/{id}
+- GET /settings/api-keys — lista API keys (hash apenas)
+- POST /settings/api-keys — cria API key (retorna plain_key uma vez)
+- DELETE /settings/api-keys/{id}
+
+## Notifications
+- GET /settings/notifications — configurações de notificação do tenant
 
 ## Regra
 Endpoints devem validar tenant, permissão, estado do recurso e regras de domínio antes de persistir alterações.

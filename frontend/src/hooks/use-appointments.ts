@@ -5,7 +5,6 @@ import type {
   AppointmentCreateRequest,
   AppointmentUpdateRequest,
   AppointmentFilters,
-  AppointmentStatus,
   Professional,
   Service,
   PaginatedResponse,

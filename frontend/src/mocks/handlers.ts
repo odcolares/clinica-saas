@@ -21,6 +21,15 @@ import type {
   ConversationMessage,
   AssignConversationRequest,
   OutboundMessageRequest,
+  TenantSettings,
+  TenantSettingsUpdateRequest,
+  IntegrationConfig,
+  IntegrationConfigCreateRequest,
+  WebhookEndpoint,
+  WebhookEndpointCreateRequest,
+  ApiKey,
+  ApiKeyCreateResponse,
+  NotificationSettings,
 } from "@/types/api"
 import {
   leads,
@@ -35,6 +44,11 @@ import {
   currentUser,
   conversations,
   conversationMessages,
+  tenantSettings,
+  integrationConfigs,
+  webhookEndpoints,
+  apiKeys,
+  notificationSettings,
   generateId,
   paginate,
 } from "./data"
@@ -232,10 +246,49 @@ export const handlers = [
     return HttpResponse.json<Professional[]>(professionals)
   }),
 
+  http.post(`${API_BASE}/professionals`, async ({ request }) => {
+    const body = await request.json() as Partial<Professional>
+    const newProf: Professional = {
+      id: generateId("prof"),
+      name: body.name || "",
+      email: body.email || null,
+      phone: body.phone || null,
+      specialties: body.specialties || "",
+      specialty_list: body.specialties ? body.specialties.split(",").map((s) => s.trim()) : [],
+      active: body.active ?? true,
+      commission_type: body.commission_type ?? "none",
+      commission_percent: body.commission_percent ?? 0,
+      commission_fixed: body.commission_fixed ?? 0,
+      user: body.user ?? null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    professionals.push(newProf)
+    return HttpResponse.json<Professional>(newProf, { status: 201 })
+  }),
+
   http.get(`${API_BASE}/professionals/:id`, ({ params }) => {
     const prof = professionals.find((p) => p.id === params.id)
     if (!prof) return HttpResponse.json({ detail: "Profissional não encontrado" }, { status: 404 })
     return HttpResponse.json<Professional>(prof)
+  }),
+
+  http.patch(`${API_BASE}/professionals/:id`, async ({ params, request }) => {
+    const prof = professionals.find((p) => p.id === params.id)
+    if (!prof) return HttpResponse.json({ detail: "Profissional não encontrado" }, { status: 404 })
+    const body = await request.json() as Partial<Professional>
+    Object.assign(prof, body, { updated_at: new Date().toISOString() })
+    if (body.specialties) {
+      prof.specialty_list = body.specialties.split(",").map((s: string) => s.trim())
+    }
+    return HttpResponse.json<Professional>(prof)
+  }),
+
+  http.delete(`${API_BASE}/professionals/:id`, ({ params }) => {
+    const index = professionals.findIndex((p) => p.id === params.id)
+    if (index === -1) return HttpResponse.json({ detail: "Profissional não encontrado" }, { status: 404 })
+    professionals.splice(index, 1)
+    return new HttpResponse(null, { status: 204 })
   }),
 
   // ─── Scheduling - Services ─────────────────────────────
@@ -523,5 +576,134 @@ export const handlers = [
     conversationMessages.push(newMsg)
     conv.updated_at = new Date().toISOString()
     return HttpResponse.json<ConversationMessage>(newMsg, { status: 201 })
+  }),
+
+  // ─── Settings (Etapa 5) ────────────────────────────────────
+  http.get(`${API_BASE}/settings/tenant`, () => {
+    return HttpResponse.json<TenantSettings>(tenantSettings)
+  }),
+
+  http.patch(`${API_BASE}/settings/tenant`, async ({ request }) => {
+    const body = await request.json() as TenantSettingsUpdateRequest
+    Object.assign(tenantSettings, body, { updated_at: new Date().toISOString() })
+    return HttpResponse.json<TenantSettings>(tenantSettings)
+  }),
+
+  http.get(`${API_BASE}/settings/integrations`, () => {
+    return HttpResponse.json<IntegrationConfig[]>(integrationConfigs)
+  }),
+
+  http.post(`${API_BASE}/settings/integrations`, async ({ request }) => {
+    const body = await request.json() as IntegrationConfigCreateRequest
+    const newInt: IntegrationConfig = {
+      id: generateId("int"),
+      provider: body.provider,
+      active: true,
+      professional_email: body.professional_email || "",
+      config: {},
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    integrationConfigs.push(newInt)
+    return HttpResponse.json<IntegrationConfig>(newInt, { status: 201 })
+  }),
+
+  http.get(`${API_BASE}/settings/integrations/:id`, ({ params }) => {
+    const integ = integrationConfigs.find((i) => i.id === params.id)
+    if (!integ) return HttpResponse.json({ detail: "Integração não encontrada" }, { status: 404 })
+    return HttpResponse.json<IntegrationConfig>(integ)
+  }),
+
+  http.patch(`${API_BASE}/settings/integrations/:id`, async ({ params, request }) => {
+    const integ = integrationConfigs.find((i) => i.id === params.id)
+    if (!integ) return HttpResponse.json({ detail: "Integração não encontrada" }, { status: 404 })
+    const body = await request.json() as Partial<IntegrationConfig>
+    Object.assign(integ, body, { updated_at: new Date().toISOString() })
+    return HttpResponse.json<IntegrationConfig>(integ)
+  }),
+
+  http.delete(`${API_BASE}/settings/integrations/:id`, ({ params }) => {
+    const index = integrationConfigs.findIndex((i) => i.id === params.id)
+    if (index === -1) return HttpResponse.json({ detail: "Integração não encontrada" }, { status: 404 })
+    integrationConfigs.splice(index, 1)
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  http.get(`${API_BASE}/settings/webhooks`, () => {
+    return HttpResponse.json<WebhookEndpoint[]>(webhookEndpoints)
+  }),
+
+  http.post(`${API_BASE}/settings/webhooks`, async ({ request }) => {
+    const body = await request.json() as WebhookEndpointCreateRequest
+    const newHook: WebhookEndpoint = {
+      id: generateId("webhook"),
+      name: body.name,
+      url: body.url,
+      events: body.events || [],
+      active: body.active ?? true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    webhookEndpoints.push(newHook)
+    return HttpResponse.json<WebhookEndpoint>(newHook, { status: 201 })
+  }),
+
+  http.get(`${API_BASE}/settings/webhooks/:id`, ({ params }) => {
+    const hook = webhookEndpoints.find((w) => w.id === params.id)
+    if (!hook) return HttpResponse.json({ detail: "Webhook não encontrado" }, { status: 404 })
+    return HttpResponse.json<WebhookEndpoint>(hook)
+  }),
+
+  http.patch(`${API_BASE}/settings/webhooks/:id`, async ({ params, request }) => {
+    const hook = webhookEndpoints.find((w) => w.id === params.id)
+    if (!hook) return HttpResponse.json({ detail: "Webhook não encontrado" }, { status: 404 })
+    const body = await request.json() as Partial<WebhookEndpoint>
+    Object.assign(hook, body, { updated_at: new Date().toISOString() })
+    return HttpResponse.json<WebhookEndpoint>(hook)
+  }),
+
+  http.delete(`${API_BASE}/settings/webhooks/:id`, ({ params }) => {
+    const index = webhookEndpoints.findIndex((w) => w.id === params.id)
+    if (index === -1) return HttpResponse.json({ detail: "Webhook não encontrado" }, { status: 404 })
+    webhookEndpoints.splice(index, 1)
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  http.get(`${API_BASE}/settings/api-keys`, () => {
+    return HttpResponse.json<ApiKey[]>(apiKeys)
+  }),
+
+  http.post(`${API_BASE}/settings/api-keys`, async ({ request }) => {
+    const body = await request.json() as { name: string }
+    const newKey: ApiKeyCreateResponse = {
+      id: generateId("key"),
+      name: body.name,
+      prefix: "a1b2c3d4",
+      active: true,
+      last_used_at: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      plain_key: `sk_a1b2c3d4_${generateId("raw")}`,
+    }
+    apiKeys.push(newKey)
+    return HttpResponse.json<ApiKeyCreateResponse>(newKey, { status: 201 })
+  }),
+
+  http.delete(`${API_BASE}/settings/api-keys/:id`, ({ params }) => {
+    const index = apiKeys.findIndex((k) => k.id === params.id)
+    if (index === -1) return HttpResponse.json({ detail: "API Key não encontrada" }, { status: 404 })
+    apiKeys.splice(index, 1)
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // ─── Notification Settings (Etapa 5) ─────────────────────
+  http.get(`${API_BASE}/settings/notifications`, () => {
+    return HttpResponse.json<NotificationSettings>(notificationSettings)
+  }),
+
+  http.patch(`${API_BASE}/settings/notifications`, async ({ request }) => {
+    const body = await request.json() as Partial<NotificationSettings>
+    Object.assign(notificationSettings, body)
+    return HttpResponse.json<NotificationSettings>(notificationSettings)
   }),
 ]
