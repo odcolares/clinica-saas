@@ -94,7 +94,7 @@ export function IntegrationForm({ integration, onSuccess, onCancel }: Integratio
             <SelectItem value="noop">Nenhuma (desativar)</SelectItem>
           </SelectContent>
         </Select>
-        <input type="hidden" {...register("provider")} />
+        </Select>
       </div>
 
       {provider === "google_calendar" && (
