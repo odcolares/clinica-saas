@@ -17,6 +17,8 @@ jobs:
         run: |
           curl -sSL https://render-cli.com/install.sh | bash
           echo "$HOME/.render/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.render/bin:$PATH"
+          which render
 
       - name: Deploy backend to Render
         run: render deploy --service "$RENDER_SERVICE_ID"
