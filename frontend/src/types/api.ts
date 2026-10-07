@@ -8,7 +8,7 @@
 export type LeadStatus = "NEW" | "CONTACTED" | "QUALIFIED" | "CONVERTED" | "LOST"
 export type AppointmentStatus = "schduled" | "confirmed" | "cancelled" | "completed" | "no_show"
 export type InteractionType = "call" | "email" | "visit" | "note"
-export type CommissionType = "none" | "percent" | "fixed"
+export type AppointmentStatus = "scheduled" | "confirmed" | "cancelled" | "completed" | "no_show"
 export type IntegrationProvider = "noop" | "google_calendar"
 
 // ─── Auth ────────────────────────────────────────────────

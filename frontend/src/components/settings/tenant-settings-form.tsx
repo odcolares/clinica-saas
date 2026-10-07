@@ -142,7 +142,7 @@ export function TenantSettingsForm({ settings, onSuccess }: TenantSettingsFormPr
                 ))}
               </SelectContent>
             </Select>
-            <input type="hidden" {...register("timezone")} />
+          </div>
           </div>
 
           <div className="space-y-2">
